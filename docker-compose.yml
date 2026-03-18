@@ -4,7 +4,7 @@ services:
   # 1. Container Frontend (Vue)
   frontend:
     image: node:20-alpine
-    container_name: vue_frontend
+    container_name: frontend-tbs
     working_dir: /app
     volumes:
       - ./frontend:/app
@@ -17,7 +17,7 @@ services:
     build:
       context: ./docker/php
       dockerfile: Dockerfile
-    container_name: laravel_app
+    container_name: backend-tbs
     volumes:
       - ./backend:/var/www/html
     depends_on:
@@ -26,7 +26,7 @@ services:
   # 3. Container Web Server (Nginx)
   webserver:
     image: nginx:alpine
-    container_name: laravel_nginx
+    container_name: webserver-tbs
     ports:
       - "8888:80" # ĐÃ ĐỔI: Map cổng 80 của Docker ra cổng 8080 của Ubuntu
     volumes:
@@ -38,11 +38,11 @@ services:
   # 4. Container Database (MySQL)
   db:
     image: mysql:8.0
-    container_name: mysql_db
+    container_name: mysql-tbs
     ports:
       - "3307:3306" # ĐÃ ĐỔI: Né cổng 3306 của aaPanel
     environment:
-      MYSQL_DATABASE: tb_camera_db
+      MYSQL_DATABASE: flower_db_server
       MYSQL_ROOT_PASSWORD: root
       MYSQL_PASSWORD: root
     volumes:
