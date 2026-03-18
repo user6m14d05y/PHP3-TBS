@@ -44,10 +44,6 @@ const collections = ref([
   { name: 'Phụ Kiện', image: 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
 ]);
 
-const logout = () => {
-    // Basic logout handling
-    router.push('/client/login');
-};
 </script>
 
 <template>
