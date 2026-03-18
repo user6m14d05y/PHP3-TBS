@@ -102,7 +102,7 @@ const login = async () => {
       <div class="hidden md:block md:w-1/2 relative">
         <img 
           class="absolute inset-0 h-full w-full object-cover" 
-          src="https://cdn.vectorstock.com/i/1000v/95/69/fashion-pattern-background-vector-639569.jpg" 
+          src="https://i.pinimg.com/736x/52/f9/f5/52f9f51d22d69ec2ac3c75c62c8f3e3f.jpg" 
           alt="Fashion Model" 
         />
         <div class="absolute inset-0 bg-black bg-opacity-20 transition-opacity duration-300 hover:bg-opacity-30"></div>

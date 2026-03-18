@@ -95,7 +95,7 @@ const handleRegister = async () => {
       <div class="hidden md:block md:w-1/2 relative">
         <img 
           class="absolute inset-0 h-full w-full object-cover" 
-          src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+          src="https://i.pinimg.com/736x/52/f9/f5/52f9f51d22d69ec2ac3c75c62c8f3e3f.jpg" 
           alt="Fashion Model 2" 
         />
         <div class="absolute inset-0 bg-black bg-opacity-20 transition-opacity duration-300 hover:bg-opacity-30"></div>
