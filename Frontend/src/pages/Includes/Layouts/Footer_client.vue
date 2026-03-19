@@ -61,7 +61,7 @@ const SubmitContact = async () => {
             <p class="text-gray-400 text-sm font-light mb-4">Đăng ký để nhận ưu đãi hấp dẫn ngay lập tức.</p>
             <form @submit.prevent="SubmitContact" class="flex border-b border-gray-600 focus-within:border-white transition pb-1">
               <input v-model="email" type="email" placeholder="Email của bạn..." class="bg-transparent border-none outline-none text-sm w-full font-light text-white placeholder-gray-500">
-              <button type="submit" class="text-white hover:text-gray-300 font-bold">→</button>
+              <button type="submit" class="text-white hover:text-gray-300 font-bold"><i class="fa-solid fa-arrow-right"></i></button>
             </form>
           </div>
         </div>

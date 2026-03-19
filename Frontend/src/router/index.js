@@ -30,6 +30,46 @@ const router = createRouter({
       name: 'admin-dashboard',
       component: () => import('../pages/Admin/dashboard.vue')
     },
+    {
+      path: '/admin/category',
+      name: 'admin-category',
+      component: () => import('../pages/Admin/category.vue')
+    },
+    {
+      path: '/admin/product',
+      name: 'admin-product',
+      component: () => import('../pages/Admin/product.vue')
+    },
+    {
+      path: '/admin/product/color',
+      name: 'admin-product-color',
+      component: () => import('../pages/Admin/color.vue')
+    },
+    {
+      path: '/admin/product/size',
+      name: 'admin-product-size',
+      component: () => import('../pages/Admin/size.vue')
+    },
+    {
+      path: '/admin/user',
+      name: 'admin-user',
+      component: () => import('../pages/Admin/user.vue')
+    },
+    {
+      path: '/admin/contact',
+      name: 'admin-contact',
+      component: () => import('../pages/Admin/contact.vue')
+    },
+    {
+      path: '/admin/setting',
+      name: 'admin-setting',
+      component: () => import('../pages/Admin/setting.vue')
+    },
+    {
+      path: '/admin/order',
+      name: 'admin-order',
+      component: () => import('../pages/Admin/order.vue')
+    },
   ],
 })
 

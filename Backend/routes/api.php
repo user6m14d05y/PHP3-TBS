@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CategoryController; // Import Controller Danh Mục
 
 // Add this line to run the route: http://localhost:8000/api
 Route::get('/', function () {
@@ -19,6 +20,13 @@ Route::post('/Login', [AuthController::class, 'Login']);
 Route::post('/SubmitContact', [ContactController::class, 'SubmitContact']);
 Route::middleware('auth:sanctum')->post('/Logout', [AuthController::class, 'Logout']);
 
+// Category routes (Dùng /category như một tài nguyên chuẩn REST)
+Route::get('/category', [CategoryController::class, 'index']); 
+Route::post('/category', [CategoryController::class, 'store']); 
+Route::post('/category/update/{id}', [CategoryController::class, 'update']); 
+Route::delete('/category/{id}', [CategoryController::class, 'destroy']);
+
+
 // User info
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,17 +35,17 @@ Route::get('/user', function (Request $request) {
 
 // Test & Debug routes
 Route::get('/users', function () {
-    $users = \Illuminate\Support\Facades\DB::table('users')->get();
+    $items = \Illuminate\Support\Facades\DB::table('users')->get();
     return response()->json([
         'status' => 'success',
-        'data' => $users
+        'data' => $items
     ]);
 });
 
 Route::get('/contact', function () {
-    $users = \Illuminate\Support\Facades\DB::table('contact')->get();
+    $contact = \Illuminate\Support\Facades\DB::table('contact')->get();
     return response()->json([
         'status' => 'success',
-        'data' => $users
+        'data' => $items
     ]);
 });

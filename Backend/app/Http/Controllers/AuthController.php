@@ -2,21 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Address;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash; // ma hoa password
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $name = $request->input('name');
-        $email = $request->input('email');
-        $password = $request->input('password');
-
-        $checkEmail = \Illuminate\Support\Facades\DB::select("SELECT * FROM users WHERE email = ?", [$email]);
-
-        if (count($checkEmail) > 0) {
+        if (User::where('email', $request->email)->exists()) {
             return response()->json([
                 'status' => 'error',
                 'errors' => [
@@ -25,13 +19,12 @@ class AuthController extends Controller
             ], 422); 
         }
 
-        $hashedPassword = \Illuminate\Support\Facades\Hash::make($password);
-        $now = \Carbon\Carbon::now()->toDateTimeString(); 
-
-        \Illuminate\Support\Facades\DB::insert(
-            "INSERT INTO users (name, email, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-            [$name, $email, $hashedPassword, 'user', $now, $now]
-        );
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), 
+            'role' => 'user'
+        ]);
 
         return response()->json([
             'status' => 'success',
@@ -41,35 +34,24 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $user = User::where('email', $request->email)->first();
 
-        $sql = "SELECT * FROM users WHERE email = ?";
-        $result = \Illuminate\Support\Facades\DB::select($sql, [$email]);
-
-        if (count($result) > 0) {
-            $user = $result[0];
-            if (\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
-                // Generate token
-                $userModel = User::find($user->id);
-                $token = $userModel->createToken('auth_token')->plainTextToken;
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Đăng nhập thành công!',
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'role' => $user->role 
-                    ]
-                ], 200);
-            }
+        if ($user && Hash::check($request->password, $user->password)) {
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Đăng nhập thành công!',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role 
+                ]
+            ], 200);
         }
         
-        // Trả về lỗi nếu không tìm thấy email HOẶC sai mật khẩu
         return response()->json([
             'status' => 'error',
             'message' => 'Email hoặc mật khẩu không chính xác!'
@@ -78,7 +60,6 @@ class AuthController extends Controller
 
     public function Logout(Request $request)
     {
-        // delete token
         $request->user()->currentAccessToken()->delete(); 
         return response()->json([
             'status' => 'success',

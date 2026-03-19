@@ -50,14 +50,14 @@ const logout = async () => {
           </div>
           <div class="flex items-center space-x-6">
             <button class="text-gray-500 hover:text-gray-900 transition">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <i class="fa-solid fa-magnifying-glass text-xl"></i>
             </button>
             <button class="text-gray-500 hover:text-gray-900 transition relative">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+              <i class="fa-solid fa-bag-shopping text-xl"></i>
               <span class="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
             </button>
             <router-link v-if="!isLoggedIn" to="/login" class="text-gray-500 hover:text-gray-900 transition relative">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              <i class="fa-regular fa-user text-xl"></i>
             </router-link>
             
             <div v-else class="hidden md:flex items-center space-x-4 ml-4 pl-4 border-l border-gray-200">
