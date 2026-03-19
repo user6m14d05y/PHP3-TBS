@@ -6,6 +6,7 @@ import axios from 'axios';
 const router = useRouter();
 const isLoggedIn = ref(false);
 const name = ref('');
+const role = ref('');
 
 onMounted(() => {
     const userSession = localStorage.getItem('user');
@@ -13,6 +14,7 @@ onMounted(() => {
         const userData = JSON.parse(userSession);
         isLoggedIn.value = userData.isLoggedIn;
         name.value = userData.name;
+        role.value = userData.role;
     }
 });
 
@@ -42,10 +44,10 @@ const logout = async () => {
         <div class="flex justify-between items-center h-20">
           <div class="flex items-center space-x-8">
             <router-link to="/" class="font-serif text-2xl font-bold tracking-wider text-black">
-              TBS
+              <img src="../../../../public/favicon.ico" class="w-20 h-20" alt="">
             </router-link>
             <nav class="hidden md:flex space-x-8">
-              <a href="#" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Thời trang</a>
+              <router-link to="/product" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Cửa hàng</router-link>
             </nav>
           </div>
           <div class="flex items-center space-x-6">

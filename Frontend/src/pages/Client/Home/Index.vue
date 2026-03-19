@@ -60,9 +60,9 @@ const collections = ref([
         <span class="text-sm uppercase tracking-[0.3em] mb-4 block font-medium">Bộ Sưu Tập Mới Nhất</span>
         <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight">Mùa Yêu Thương</h1>
         <p class="text-lg md:text-xl font-light mb-10 text-gray-100">Khám phá phong cách tối giản mang đậm chất riêng, tôn vinh vẻ đẹp thuần khiết và thanh lịch từ bên trong bạn.</p>
-        <button class="bg-white text-black px-10 py-4 text-sm font-semibold tracking-wider hover:bg-gray-100 transition duration-300">
+        <router-link to="/product" class="cursor-pointer bg-white text-black px-10 py-4 text-sm font-semibold tracking-wider hover:bg-gray-100 transition duration-300">
           MUA SẮM NGAY
-        </button>
+        </router-link>
       </div>
     </div>
 

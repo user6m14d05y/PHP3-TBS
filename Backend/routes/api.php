@@ -6,7 +6,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CategoryController; // Import Controller Danh Mục
 
-// Add this line to run the route: http://localhost:8000/api
 Route::get('/', function () {
     return response()->json([
         'status' => 'success',

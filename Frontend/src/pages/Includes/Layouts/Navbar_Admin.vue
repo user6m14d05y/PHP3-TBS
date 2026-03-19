@@ -64,14 +64,17 @@ const getLinkClass = (path, exact = false) => {
             </router-link>
             <!-- Sản phẩm & Sub-menu -->
             <div>
-                <button @click="toggleProductMenu" :class="getLinkClass('/admin/product')" class="w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer group/item text-left">
-                    <div class="flex items-center w-full">
+                <div :class="getLinkClass('/admin/product')" class="w-full flex items-center justify-between rounded-lg text-sm font-medium transition-colors group/item text-left overflow-hidden">
+                    <!-- Phần bên trái (Icon + Text): Chuyển link -->
+                    <router-link to="/admin/product" class="flex items-center flex-1 px-3 py-3 cursor-pointer">
                         <i class="fa-solid fa-box text-lg shrink-0 transition-transform duration-300 group-hover/item:scale-110"></i>
                         <span :class="isExpanded ? 'opacity-100 ml-4' : 'opacity-0 w-0 h-0 overflow-hidden'" class="transition-all duration-300">Sản phẩm</span>
+                    </router-link>
+                    <!-- Phần bên phải (Mũi tên): Đóng / mở menu -->
+                    <div @click.stop.prevent="toggleProductMenu" v-show="isExpanded" class="px-3 py-3 cursor-pointer hover:bg-black/10 dark:hover:bg-white/10 transition-colors shrink-0 flex items-center h-full">
+                        <i :class="{'rotate-180': isProductMenuOpen}" class="fa-solid fa-chevron-down text-sm shrink-0 transition-transform duration-300"></i>
                     </div>
-                    <!-- Đổi sang v-show để đảm bảo transition mượt -->
-                    <i v-show="isExpanded" :class="{'rotate-180': isProductMenuOpen}" class="fa-solid fa-chevron-down text-sm shrink-0 transition-transform duration-300"></i>
-                </button>
+                </div>
                 
                 <!-- Sub Menu mượt (Accordion Transition) -->
                 <div 

@@ -23,6 +23,11 @@ const router = createRouter({
       name: 'forgot',
       component: () => import('../pages/Client/Auth/Forgot.vue')
     },
+    {
+      path: '/product',
+      name: 'product',
+      component: () => import('../pages/Client/Home/product.vue')
+    },
 
     // Admin
     {
@@ -71,6 +76,54 @@ const router = createRouter({
       component: () => import('../pages/Admin/order.vue')
     },
   ],
+})
+
+router.beforeEach((to, from) => {
+  const token = localStorage.getItem('access_token');
+  
+  let role = 'user'; // Mặc định nếu không có role
+  try {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      // Bạn đang mã hóa role bằng btoa() ở tên biến '_r' trong file login.vue
+      if (userObj && userObj._r) {
+        role = atob(userObj._r); // Giải mã base64 (atob) để lấy ra text thực sự (ví dụ: 'admin')
+      }
+    }
+  } catch (e) {
+    console.error('Lỗi đọc phân quyền:', e);
+  }
+
+  const isAdminRoute = to.path.startsWith('/admin')
+  const isLoginRoute = to.path.startsWith('/login')
+  const isAuthRoute = ['login', 'register', 'forgot'].includes(to.name)
+
+
+  if (isLoginRoute && token) {
+    return { name: 'home' }
+  }
+
+  if (isAdminRoute) {
+    if (!token) {
+      return { name: 'home' }
+    }
+    
+    if (role !== 'admin') {
+      alert('Cảnh báo: Bạn không có quyền truy cập vào khu vực quản trị!')
+      return { name: 'home' }
+    }
+  }
+  
+  if (isAuthRoute && token) {
+    if (role === 'admin') {
+      return { name: 'admin-dashboard' }
+    } else {
+      return { name: 'home' }
+    }
+  }
+
+  return true;
 })
 
 export default router
