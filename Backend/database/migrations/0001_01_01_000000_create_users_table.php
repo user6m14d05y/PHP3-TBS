@@ -20,6 +20,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->string('google_id')->nullable();
+            $table->string('facebook_id')->nullable();
+            $table->integer('phone')->nullable();
             $table->string('role', 12)->nullable();
         });
 

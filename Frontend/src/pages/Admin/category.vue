@@ -16,7 +16,7 @@ const message = ref('');
 
 const fetchCategories = async () => {
     try {
-        const response = await axios.get('http://localhost:8888/api/category');
+        const response = await axios.get('http://127.0.0.1:8888/api/category');
         categories.value = response.data.data;
         if (message.value) {
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: message.value, showConfirmButton: false, timer: 3000, timerProgressBar: true });
@@ -109,9 +109,9 @@ const editItem = (item) => {
 const saveItem = async () => {
     try {
         if (itemForm.value.id) {
-            await axios.post(`http://localhost:8888/api/category-item/update/${itemForm.value.id}`, itemForm.value);
+            await axios.post(`http://127.0.0.1:8888/api/category-item/update/${itemForm.value.id}`, itemForm.value);
         } else {
-            await axios.post('http://localhost:8888/api/category-item', itemForm.value);
+            await axios.post('http://127.0.0.1:8888/api/category-item', itemForm.value);
         }
         isItemModalOpen.value = false;
         await fetchCategoryItems(selectedParent.value);
@@ -124,7 +124,7 @@ const saveItem = async () => {
 const deleteItem = async (id) => {
     if (confirm('Bạn có chắc chắn muốn xóa danh mục con này?')) {
         try {
-            await axios.delete(`http://localhost:8888/api/category-item/${id}`);
+            await axios.delete(`http://127.0.0.1:8888/api/category-item/${id}`);
             itemMessage.value = 'Xóa danh mục con thành công!';
             await fetchCategoryItems(selectedParent.value);
         } catch (error) {
@@ -189,7 +189,7 @@ const toggleTheme = () => {
                                         <td class="px-6 py-4 text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ index + 1 }}</td>
                                         <td class="px-6 py-4">
                                             <div class="w-14 h-14 rounded-lg overflow-hidden border" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-                                                <img :src="'http://localhost:8888/images/' + cat.img" class="w-full h-full object-cover" :alt="cat.name">
+                                                <img :src="'http://127.0.0.1:8888/images/' + cat.img" class="w-full h-full object-cover" :alt="cat.name">
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
