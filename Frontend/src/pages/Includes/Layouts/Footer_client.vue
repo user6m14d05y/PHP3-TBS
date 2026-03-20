@@ -14,7 +14,7 @@ const SubmitContact = async () => {
   }
 
   try {
-    const reponse = await axios.post("http://localhost:8888/api/SubmitContact", {
+    const reponse = await axios.post("http://127.0.0.1:8888/api/SubmitContact", {
       email: email.value
     }); 
     if (reponse.data.status == "success"){
@@ -31,48 +31,54 @@ const SubmitContact = async () => {
 
 <template>
     <!-- Footer Simple -->
-    <footer class="bg-gray-900 pt-16 pb-8 text-white border-t border-gray-200">
+    <footer class="bg-[#fff9f9] pt-16 pb-8 text-gray-900 border-t border-pink-100 font-sans">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div class="col-span-1 md:col-span-1">
-            <h2 class="text-2xl font-serif font-bold tracking-widest mb-6">TBS</h2>
-            <p class="text-gray-400 text-sm font-light leading-relaxed mb-6">Phân phối thời trang cao cấp với thiết kế tinh xảo và tính ứng dụng cao nhất cho cuộc sống hiện đại.</p>
+            <img src="../../../../public/favicon.ico" class="w-25 h-25" alt="Logo TBS">
+            <p class="text-gray-500 text-sm font-light leading-relaxed mb-6">Nơi hội tụ những nhành hoa tươi thắm và tinh tế nhất, mang tâm tình gửi gắm vào từng nhành hoa nghệ thuật.</p>
           </div>
           <div>
-            <h3 class="text-sm font-bold uppercase tracking-wider mb-5">Danh Mục</h3>
-            <ul class="space-y-3 text-gray-400 text-sm font-light">
-              <li><a href="#" class="hover:text-white transition">Sản Phẩm Mới</a></li>
-              <li><a href="#" class="hover:text-white transition">Áo Khoác Nam</a></li>
-              <li><a href="#" class="hover:text-white transition">Váy Đầm Nữ</a></li>
-              <li><a href="#" class="hover:text-white transition">Giày Phụ Kiện</a></li>
+            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-900 border-b border-pink-100 pb-2 inline-block">Sản Phẩm</h3>
+            <ul class="space-y-3 text-gray-500 text-sm">
+              <li><router-link to="/product" class="hover:text-pink-600 transition">Hoa Bó Mới Về</router-link></li>
+              <li><router-link to="/product" class="hover:text-pink-600 transition">Hoa Khai Trương</router-link></li>
+              <li><router-link to="/product" class="hover:text-pink-600 transition">Vòng Hoa Chia Buồn</router-link></li>
+              <li><router-link to="/product" class="hover:text-pink-600 transition">Dịch Vụ Điện Hoa</router-link></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-sm font-bold uppercase tracking-wider mb-5">Hỗ Trợ</h3>
-            <ul class="space-y-3 text-gray-400 text-sm font-light">
-              <li><a href="#" class="hover:text-white transition">Chính Sách Giao Hàng</a></li>
-              <li><a href="#" class="hover:text-white transition">Đổi Trả Khách Hàng</a></li>
-              <li><a href="#" class="hover:text-white transition">Câu Hỏi Thường Gặp</a></li>
-              <li><a href="#" class="hover:text-white transition">Liên Hệ</a></li>
+            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-900 border-b border-pink-100 pb-2 inline-block">Hỗ Trợ</h3>
+            <ul class="space-y-3 text-gray-500 text-sm">
+              <li><a href="#" class="hover:text-pink-600 transition">Chính Sách Giao Hoa</a></li>
+              <li><a href="#" class="hover:text-pink-600 transition">Đổi Trả & Hoàn Tiền</a></li>
+              <li><a href="#" class="hover:text-pink-600 transition">Hướng Dẫn Đặt Hàng</a></li>
+              <li><a href="#" class="hover:text-pink-600 transition">Liên Hệ Góp Ý</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-sm font-bold uppercase tracking-wider mb-5">Nhận Bản Tin</h3>
-            <p class="text-gray-400 text-sm font-light mb-4">Đăng ký để nhận ưu đãi hấp dẫn ngay lập tức.</p>
-            <form @submit.prevent="SubmitContact" class="flex border-b border-gray-600 focus-within:border-white transition pb-1">
-              <input v-model="email" type="email" placeholder="Email của bạn..." class="bg-transparent border-none outline-none text-sm w-full font-light text-white placeholder-gray-500">
-              <button type="submit" class="text-white hover:text-gray-300 font-bold"><i class="fa-solid fa-arrow-right"></i></button>
+            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-900 border-b border-pink-100 pb-2 inline-block">Đăng Ký Nhận Tin</h3>
+            <p class="text-gray-500 text-sm font-light mb-6">Để nhận ưu đãi đặc biệt và các mẫu hoa mới nhất hàng tuần.</p>
+            <form @submit.prevent="SubmitContact" class="flex border-b border-pink-200 focus-within:border-pink-500 transition pb-2">
+              <input v-model="email" type="email" placeholder="Email của bạn..." class="bg-transparent border-none outline-none text-sm w-full font-light text-gray-700 placeholder-gray-400">
+              <button type="submit" class="text-pink-600 hover:text-pink-800 font-bold"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
           </div>
         </div>
-        <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs font-light">
-          <p>© 2026 TBS Fashion. All rights reserved.</p>
+        <div class="border-t border-pink-50 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-[11px] uppercase tracking-widest">
+          <p>© 2026 TBS Flora Store. Lan tỏa yêu thương bằng hoa tươi.</p>
           <div class="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" class="hover:text-white transition">Điều Khoản Phục Vụ</a>
-            <a href="#" class="hover:text-white transition">Bảo Mật Quyền Riêng Tư</a>
+            <a href="#" class="hover:text-pink-600 transition">Chính Sách Bảo Mật</a>
+            <a href="#" class="hover:text-pink-600 transition">Điều Khoản Phục Vụ</a>
           </div>
         </div>
       </div>
     </footer>
-    </template>
+</template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;700;900&display=swap');
+.font-serif { font-family: 'Playfair Display', serif; }
+.font-sans { font-family: 'Inter', sans-serif; }
+</style>
  

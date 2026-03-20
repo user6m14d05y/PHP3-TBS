@@ -27,7 +27,7 @@ const emit = defineEmits(['toggle-sidebar', 'toggle-theme']);
 const logout = async () => {
     try {
         const token = localStorage.getItem('access_token');
-        await axios.post('http://localhost:8888/api/Logout', {}, {
+        await axios.post('http://127.0.0.1:8888/api/Logout', {}, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

@@ -28,6 +28,11 @@ const router = createRouter({
       name: 'product',
       component: () => import('../pages/Client/Home/product.vue')
     },
+    {
+      path: '/product/category/:id',
+      name: 'product-category',
+      component: () => import('../pages/Client/Home/categoryProduct.vue')
+    },
 
     {
       path: '/admin/dashboard',
