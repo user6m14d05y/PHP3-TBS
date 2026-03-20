@@ -33,7 +33,7 @@ const logout = async () => {
         localStorage.removeItem('user');
         isLoggedIn.value = false;
         name.value = '';
-        router.push('/login');
+        router.replace('/');
     }
 };
 </script>    
@@ -43,11 +43,11 @@ const logout = async () => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
           <div class="flex items-center space-x-8">
-            <router-link to="/" class="font-serif text-2xl font-bold tracking-wider text-black">
+            <router-link replace to="/" class="font-serif text-2xl font-bold tracking-wider text-black">
               <img src="../../../../public/favicon.ico" class="w-20 h-20" alt="">
             </router-link>
             <nav class="hidden md:flex space-x-8">
-              <router-link to="/product" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Cửa hàng</router-link>
+              <router-link replace to="/product" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Cửa hàng</router-link>
             </nav>
           </div>
           <div class="flex items-center space-x-6">

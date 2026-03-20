@@ -29,97 +29,90 @@ const router = createRouter({
       component: () => import('../pages/Client/Home/product.vue')
     },
 
-    // Admin
     {
       path: '/admin/dashboard',
       name: 'admin-dashboard',
-      component: () => import('../pages/Admin/dashboard.vue')
+      component: () => import('../pages/Admin/dashboard.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/category',
       name: 'admin-category',
-      component: () => import('../pages/Admin/category.vue')
+      component: () => import('../pages/Admin/category.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/product',
       name: 'admin-product',
-      component: () => import('../pages/Admin/product.vue')
-    },
-    {
-      path: '/admin/product/color',
-      name: 'admin-product-color',
-      component: () => import('../pages/Admin/color.vue')
+      component: () => import('../pages/Admin/product.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/product/size',
       name: 'admin-product-size',
-      component: () => import('../pages/Admin/size.vue')
+      component: () => import('../pages/Admin/size.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/user',
       name: 'admin-user',
-      component: () => import('../pages/Admin/user.vue')
+      component: () => import('../pages/Admin/user.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/contact',
       name: 'admin-contact',
-      component: () => import('../pages/Admin/contact.vue')
+      component: () => import('../pages/Admin/contact.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/setting',
       name: 'admin-setting',
-      component: () => import('../pages/Admin/setting.vue')
+      component: () => import('../pages/Admin/setting.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/order',
       name: 'admin-order',
-      component: () => import('../pages/Admin/order.vue')
+      component: () => import('../pages/Admin/order.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
   ],
 })
 
 router.beforeEach((to, from) => {
   const token = localStorage.getItem('access_token');
-  
-  let role = 'user'; // Mặc định nếu không có role
+
+  let role = 'user';
   try {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       const userObj = JSON.parse(userStr);
-      // Bạn đang mã hóa role bằng btoa() ở tên biến '_r' trong file login.vue
       if (userObj && userObj._r) {
-        role = atob(userObj._r); // Giải mã base64 (atob) để lấy ra text thực sự (ví dụ: 'admin')
+        role = atob(userObj._r);
       }
     }
   } catch (e) {
     console.error('Lỗi đọc phân quyền:', e);
   }
 
-  const isAdminRoute = to.path.startsWith('/admin')
-  const isLoginRoute = to.path.startsWith('/login')
-  const isAuthRoute = ['login', 'register', 'forgot'].includes(to.name)
+  const isAuthRoute = ['login', 'register', 'forgot'].includes(to.name);
 
-
-  if (isLoginRoute && token) {
-    return { name: 'home' }
-  }
-
-  if (isAdminRoute) {
+  if (to.meta.requiresAuth) {
     if (!token) {
-      return { name: 'home' }
+      return { name: 'home', replace: true };
     }
-    
-    if (role !== 'admin') {
-      alert('Cảnh báo: Bạn không có quyền truy cập vào khu vực quản trị!')
-      return { name: 'home' }
+    if (to.meta.requiresAdmin && role !== 'admin') {
+      alert('Cảnh báo: Bạn không có quyền truy cập vào khu vực quản trị!');
+      return { name: 'home', replace: true };
     }
   }
-  
+
   if (isAuthRoute && token) {
     if (role === 'admin') {
-      return { name: 'admin-dashboard' }
+      return { name: 'admin-dashboard' };
     } else {
-      return { name: 'home' }
+      return { name: 'home' };
     }
   }
 

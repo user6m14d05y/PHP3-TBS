@@ -8,6 +8,38 @@ use Illuminate\Support\Facades\Hash; // ma hoa password
 
 class AuthController extends Controller
 {
+
+    public function index() {
+        $users = User::all();
+         return response()->json([
+            'status' => 'success',
+            'data'   => $users
+        ]);
+    }
+
+    public function update(Request $request) {
+        $user = User::find($request->id);
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cập nhật tài khoản thành công!'
+        ], 200);
+    }
+
+    public function destroy($id) {
+        $user = User::find($id);
+        $user->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Xóa tài khoản thành công!'
+        ], 200);
+    }
+
     public function register(Request $request)
     {
         if (User::where('email', $request->email)->exists()) {

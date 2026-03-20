@@ -8,58 +8,74 @@ use Illuminate\Http\Request;
 class SizeController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lấy danh sách tất cả kích thước.
      */
     public function index()
     {
-        //
+        $sizes = Size::all();
+        return response()->json([
+            'status' => 'success',
+            'data'   => $sizes
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Thêm kích thước mới.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:50',
+        ]);
+
+        $size = Size::create([
+            'name' => $request->name,
+        ]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Bạn đã thêm kích thước thành công',
+            'data'    => $size
+        ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Cập nhật kích thước theo ID.
      */
-    public function show(size $size)
+    public function update(Request $request, $id)
     {
-        //
+        $size = Size::find($id);
+
+        if (!$size) {
+            return response()->json(['message' => 'Không tìm thấy kích thước để sửa'], 404);
+        }
+
+        $size->name = $request->name ?? $size->name;
+        $size->save();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Bạn đã cập nhật kích thước thành công',
+            'data'    => $size
+        ]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Xóa kích thước theo ID.
      */
-    public function edit(size $size)
+    public function destroy($id)
     {
-        //
-    }
+        $size = Size::find($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, size $size)
-    {
-        //
-    }
+        if (!$size) {
+            return response()->json(['message' => 'Không tìm thấy kích thước để xóa'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(size $size)
-    {
-        //
+        $size->delete();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Bạn đã xóa kích thước thành công',
+        ]);
     }
 }
