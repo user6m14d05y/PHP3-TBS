@@ -39,7 +39,7 @@ const logout = async () => {
         localStorage.removeItem('user');
         isLoggedIn.value = false;
         name.value = '';
-        router.push('/login');
+        router.replace('/');
     }
 };
 

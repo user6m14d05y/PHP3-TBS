@@ -2,12 +2,24 @@
 import header_admin from '../Includes/Layouts/Header_Admin.vue';
 import navbar_admin from '../Includes/Layouts/Navbar_Admin.vue';
 import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
 const isDark = ref(false);
 const isSidebarOpen = ref(true);
+const users = ref([]);
 
-// Lấy chế độ dark mode từ localStorage (nếu có)
+const fetchUsers = async () => {
+    try {
+        const response = await axios.get('http://localhost:8888/api/user');
+        users.value = response.data.data; 
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+};
+
+
 onMounted(() => {
+    fetchUsers();
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         isDark.value = true;
@@ -62,7 +74,7 @@ const toggleTheme = () => {
                             </button>
                         </div>
 
-                        <!-- Bảng dữ liệu (HTML Table) -->
+                        <!-- TABLE -->
                         <div class="overflow-x-auto rounded-lg border"
                             :class="isDark ? 'border-gray-700' : 'border-gray-200'">
                             <table class="w-full text-left border-collapse">
@@ -70,20 +82,38 @@ const toggleTheme = () => {
                                     <tr :class="isDark ? 'bg-gray-800/50 text-gray-400 border-gray-700' : 'bg-gray-50 text-gray-600 border-gray-200'"
                                         class="border-b text-xs uppercase tracking-wider">
                                         <th class="px-6 py-4 font-semibold">STT</th>
-                                        <th class="px-6 py-4 font-semibold">Hình ảnh</th>
-                                        <th class="px-6 py-4 font-semibold">Tên danh mục</th>
+                                        <th class="px-6 py-4 font-semibold">Tên</th>
+                                        <th class="px-6 py-4 font-semibold">Email</th>
+                                        <th class="px-6 py-4 font-semibold">Ngày tạo</th>
+                                        <th class="px-6 py-4 font-semibold">Phân Quyền</th>
                                         <th class="px-6 py-4 font-semibold text-right">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody :class="isDark ? 'divide-gray-700' : 'divide-gray-200'" class="divide-y">
-                                    <tr :class="isDark ? 'bg-gray-800/50 text-gray-400 border-gray-700' : 'bg-gray-50 text-gray-600 border-gray-200'"
-                                        class="border-b text-xs uppercase tracking-wider">
-                                        <th class="px-6 py-4 font-semibold">abc</th>
-                                        <th class="px-6 py-4 font-semibold">dèf</th>
-                                        <th class="px-6 py-4 font-semibold">ghk</th>
-                                        <th class="px-6 py-4 font-semibold text-right">Thao tác</th>
+                                    <tr v-for="(user, index) in users" :key="user.id"
+                                        :class="isDark ? 'hover:bg-gray-700/50 text-gray-300 border-gray-700' : 'hover:bg-gray-50 text-gray-700 border-gray-200'"
+                                        class="border-b transition-colors">
+                                        <td class="px-6 py-4">{{ index + 1 }}</td>
+                                        <td class="px-6 py-4 font-medium">{{ user.name }}</td>
+                                        <td class="px-6 py-4">{{ user.email }}</td>
+                                        <td class="px-6 py-4">{{ user.created_at }}</td>
+                                        <td class="px-6 py-4">
+                                            <span :class="user.role === 'admin'
+                                                ? 'bg-purple-100 text-purple-700'
+                                                : 'bg-green-100 text-green-700'"
+                                                class="px-2 py-1 rounded-full text-xs font-semibold">
+                                                {{ user.role }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right space-x-4 whitespace-nowrap">
+                                            <button class="text-blue-500 hover:text-blue-700 transition-colors">
+                                                <i class="fa-regular fa-pen-to-square text-lg"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700 transition-colors">
+                                                <i class="fa-regular fa-trash-can text-lg"></i>
+                                            </button>
+                                        </td>
                                     </tr>
-
                                 </tbody>
                             </table>
                         </div>

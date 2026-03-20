@@ -65,9 +65,9 @@ const login = async () => {
       // })
       
       if (response.data.user.role === 'admin') {
-         router.push('/admin/dashboard');
+         router.replace('/admin/dashboard');
       } else {
-         router.push('/');
+         router.replace('/');
       }
     }
   } catch (error) {

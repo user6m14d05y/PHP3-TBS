@@ -12,7 +12,11 @@ class ContactController extends Controller
      */
     public function index()
     {
-        // 
+        $contacts = Contact::all();
+         return response()->json([
+            'status' => 'success',
+            'data'   => $contacts
+        ]);
     }
     public function SubmitContact(Request $request)
     {
