@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,22 @@ const router = createRouter({
       name: 'product',
       component: () => import('../pages/Client/Home/product.vue')
     },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: () => import('../pages/Client/Cart/Index.vue')
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../pages/Client/Cart/Checkout.vue')
+    },
+    {
+      path: '/order-success',
+      name: 'order-success',
+      component: () => import('../pages/Client/Cart/OrderSuccess.vue')
+    },
+    
     {
       path: '/product/category/:id',
       name: 'product-category',
@@ -85,35 +102,32 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from) => {
-  const token = localStorage.getItem('access_token');
-
-  let role = 'user';
-  try {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const userObj = JSON.parse(userStr);
-      if (userObj && userObj._r) {
-        role = atob(userObj._r);
-      }
-    }
-  } catch (e) {
-    console.error('Lỗi đọc phân quyền:', e);
+router.beforeEach(async (to, from) => {
+  const authStore = useAuthStore();
+  
+  // Auto fetch user data from server if not loaded to ensure security
+  if (!authStore.isLoaded) {
+    await authStore.fetchUser();
   }
 
+  const isLoggedIn = !!authStore.user;
+  const role = authStore.user?.role || 'user';
   const isAuthRoute = ['login', 'register', 'forgot'].includes(to.name);
 
+  // Block if route requires login
   if (to.meta.requiresAuth) {
-    if (!token) {
+    if (!isLoggedIn) {
       return { name: 'home', replace: true };
     }
+    // Block if route requires admin but not admin
     if (to.meta.requiresAdmin && role !== 'admin') {
       alert('Cảnh báo: Bạn không có quyền truy cập vào khu vực quản trị!');
       return { name: 'home', replace: true };
     }
   }
 
-  if (isAuthRoute && token) {
+  // If entering Login/Register page but already logged in
+  if (isAuthRoute && isLoggedIn) {
     if (role === 'admin') {
       return { name: 'admin-dashboard' };
     } else {

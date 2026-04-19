@@ -1,1 +1,41 @@
 @import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-headline: "Noto Serif", serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
+
+  /* Colors (Checkout & Index) */
+  --color-primary: #D14D72;
+  --color-primary-light: #FFB4C2;
+  /* --color-primary-dark: #A83C58; */
+  --color-background-light: #FAFAFA;
+  /* --color-background-dark: #121212; */
+  --color-surface-light: #FFFFFF;
+  /* --color-surface-dark: #1E1E1E; */
+  --color-text-light: #333333;
+  --color-text-light-muted: #666666;
+  /* --color-text-dark: #F5F5F5; */
+  /* --color-text-dark-muted: #A0A0A0; */
+  --color-border-light: #E5E7EB;
+  /* --color-border-dark: #374151; */
+
+  /* Additional Colors (Order Success) */
+  --color-secondary-container: #e8e1e2;
+  --color-primary-dim: #7c4151;
+  --color-surface-container-low: #f4f3f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-background: #fbf9f9;
+  --color-on-surface: #313333;
+  --color-on-surface-variant: #5e5f60;
+  --color-on-primary: #fff7f7;
+}
+
+@layer base {
+  body {
+    @apply font-sans;
+  }
+}

@@ -33,7 +33,7 @@ return new class extends Migration
 
         // Index cho contact email lookup
         Schema::table('contact', function (Blueprint $table) {
-            $table->index('email', 'idx_contact_email');
+            $table->unique('email', 'idx_contact_email');
         });
     }
 
@@ -57,7 +57,7 @@ return new class extends Migration
         });
 
         Schema::table('contact', function (Blueprint $table) {
-            $table->dropIndex('idx_contact_email');
+            $table->dropUnique('idx_contact_email');
         });
     }
 };

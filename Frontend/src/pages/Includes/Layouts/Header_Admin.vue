@@ -1,22 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '../../../stores/auth';
 
 const router = useRouter();
-const isLoggedIn = ref(false);
-const name = ref('');
-const email = ref('');
+const authStore = useAuthStore();
 
-onMounted(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-        isLoggedIn.value = true;
-        const userData = JSON.parse(localStorage.getItem('user'));
-        name.value = userData.name;
-        email.value = userData.email;
-    }
-});
+const isLoggedIn = computed(() => !!authStore.user);
+const name = computed(() => authStore.user?.name || '');
+const email = computed(() => authStore.user?.email || '');
 
 const props = defineProps({
     isDark: Boolean
@@ -27,18 +20,13 @@ const emit = defineEmits(['toggle-sidebar', 'toggle-theme']);
 const logout = async () => {
     try {
         const token = localStorage.getItem('access_token');
-        await axios.post('http://127.0.0.1:8888/api/Logout', {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+        await axios.post('http://localhost:8888/api/Logout', {}, {
+            headers: { Authorization: `Bearer ${token}` }
         });
     } catch (error) {
         console.error("Lỗi logout server:", error);
     } finally {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
-        isLoggedIn.value = false;
-        name.value = '';
+        authStore.logout();
         router.replace('/');
     }
 };

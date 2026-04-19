@@ -63,4 +63,9 @@ docker-compose down
 docker-compose down -v
 ```
 
-##
+## Update  Pinia (State Management) 
+```bash
+# Cập nhật Pinia
+npm install pinia axios
+```
+
