@@ -15,29 +15,17 @@ const router = useRouter();
 const login = async () => {
 
   if (email.value === ""){
-    Swal.fire({
-      icon: 'error',
-      title: "Vui lòng nhập email của bạn",
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-    })
+    alert("Vui lòng nhập email của bạn");
     return;
   }
   if (password.value === ""){
-    Swal.fire({
-      icon: 'error',
-      title: "Vui lòng nhập mật khẩu của bạn",
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-    })
+    alert("Vui lòng nhập mật khẩu của bạn")
     return;
   }
 
   isSubmitting.value = true;
   try {
-    const response = await axios.post('http://127.0.0.1:8888/api/Login', {
+    const response = await axios.post('http://localhost:8888/api/Login', {
         email: email.value,
         password: password.value
     });

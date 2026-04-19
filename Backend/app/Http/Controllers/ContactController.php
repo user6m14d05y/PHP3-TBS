@@ -22,10 +22,8 @@ class ContactController extends Controller
     {
         $email = $request->input('email');
 
-        // Check email validate
-        $checkEmail = \Illuminate\Support\Facades\DB::select("SELECT * FROM contact WHERE email = ?", [$email]);
-
-        if (count($checkEmail) > 0) {
+        // Check email validate — dùng Eloquent thay raw SQL
+        if (Contact::where('email', $email)->exists()) {
             return response()->json([
                 'status' => 'error',
                 'errors' => [
@@ -34,8 +32,8 @@ class ContactController extends Controller
             ], 422); 
         }
 
-        // Insert data to sql
-        \Illuminate\Support\Facades\DB::insert( "INSERT INTO contact (email) VALUES (?)", [$email] );
+        // Insert data — dùng Eloquent
+        Contact::create(['email' => $email]);
 
         // Report success to interface
         return response()->json([

@@ -103,25 +103,19 @@ const logout = async () => {
                             :class="isDark ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-black'"
                             class="flex items-center px-4 py-2 text-sm transition-colors">
                             <i class="fa-regular fa-user mr-2"></i>
-                            Hồ sơ 
-                        </router-link>
-                        <!-- Home -->
-                        <router-link to="/"
-                            :class="isDark ? 'text  -gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-black'"
-                            class="flex items-center px-4 py-2 text-sm transition-colors">
-                            <i class="fa-solid fa-house mr-2"></i>
-                            Trang chủ
-                        </router-link>
-                        <!-- Settings -->
-                        <router-link to="/admin/setting"
-                            :class="isDark ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-black'"
-                            class="flex items-center px-4 py-2 text-sm transition-colors">
-                            <i class="fa-solid fa-gear mr-2"></i>
-                            Cài đặt
+                            Hồ sơ
                         </router-link>
                     </div>
 
                     <div :class="isDark ? 'border-gray-700' : 'border-gray-100'" class="border-t my-1"></div>
+
+                    <!-- Home -->
+                    <router-link to="/"
+                        :class="isDark ? 'text  -gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-black'"
+                        class="flex items-center px-4 py-2 text-sm transition-colors">
+                        <i class="fa-solid fa-user-tie mr-2"></i>
+                        Quản trị
+                    </router-link>
 
                     <div class="py-2">
                         <!-- Logout -->
