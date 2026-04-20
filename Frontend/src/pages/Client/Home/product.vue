@@ -14,7 +14,7 @@ const sortOption = ref('default');
 
 const fetchCategories = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8888/api/category');
+    const response = await axios.get('http://localhost:8888/api/category');
     categories.value = response.data.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -23,7 +23,7 @@ const fetchCategories = async () => {
 
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8888/api/product?limit=100');
+    const response = await axios.get('http://localhost:8888/api/product?limit=100');
     products.value = response.data.data;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -158,7 +158,7 @@ const goToCategory = (id) => {
         <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="product in filteredProducts" :key="product.id" class="group cursor-pointer">
               <div class="relative h-80 mb-4 overflow-hidden bg-gray-100">
-                <img :src="'http://127.0.0.1:8888/images/' + product.thumbnail" :alt="product.name"
+                <img :src="'http://localhost:8888/images/' + product.thumbnail" :alt="product.name"
                   class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
                 <div
                   class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition duration-300">

@@ -1,6 +1,9 @@
 <script setup>
+import { ref } from 'vue';
 import Header_client from '@/pages/Includes/Layouts/Header_client.vue';
 import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
+
+const addressOption = ref('new'); // Mặc định chọn form địa chỉ mới
 </script>
 <template>
 
@@ -22,7 +25,21 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                             <span class="material-symbols-outlined text-primary">local_shipping</span>
                             Thông Tin Giao Hàng
                         </h2>
-                        <form class="space-y-5">
+                        <div class="flex p-1 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg mb-6">
+                            <button @click="addressOption = 'saved'" type="button" 
+                                :class="{'bg-primary text-white shadow': addressOption === 'saved', 'text-text-light-muted dark:text-text-dark-muted hover:text-text-light dark:hover:text-text-dark': addressOption !== 'saved'}" 
+                                class="flex-1 py-4 rounded-md text-sm font-medium transition-all">
+                                Địa chỉ đã lưu
+                            </button>
+                            <button @click="addressOption = 'new'" type="button" 
+                                :class="{'bg-primary text-white shadow': addressOption === 'new', 'text-text-light-muted dark:text-text-dark-muted hover:text-text-light dark:hover:text-text-dark': addressOption !== 'saved'}" 
+                                class="flex-1 py-4 rounded-md text-sm font-medium transition-all">
+                                Địa chỉ mới
+                            </button>
+                        </div>
+                        
+                        <!-- Form Địa Chỉ Mới -->
+                        <form v-if="addressOption === 'new'" class="space-y-5 animate-fade-in">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="fullName">Họ và Tên <span
@@ -84,6 +101,30 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                                     placeholder="Ghi chú thêm về thời gian giao hàng, lời nhắn..." rows="3"></textarea>
                             </div>
                         </form>
+
+                        <!-- Danh Sách Địa Chỉ Đã Lưu (Demo) -->
+                        <div v-else class="space-y-4 animate-fade-in">
+                            <label class="flex items-start p-4 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:border-primary dark:hover:border-primary transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                <input checked class="mt-1 text-primary focus:ring-primary" name="savedAddress" type="radio" value="1" />
+                                <div class="ml-3 flex-grow">
+                                    <div class="flex justify-between">
+                                        <span class="block font-medium text-text-light dark:text-text-dark">Nguyễn Văn A - 0901234567</span>
+                                        <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Mặc định</span>
+                                    </div>
+                                    <span class="block text-sm text-text-light-muted dark:text-text-dark-muted mt-1">123 Đường Số 1, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+                                </div>
+                            </label>
+                            
+                            <label class="flex items-start p-4 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:border-primary dark:hover:border-primary transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                <input class="mt-1 text-primary focus:ring-primary" name="savedAddress" type="radio" value="2" />
+                                <div class="ml-3 flex-grow">
+                                    <div class="flex justify-between">
+                                        <span class="block font-medium text-text-light dark:text-text-dark">Nguyễn Văn B - 0987654321</span>
+                                    </div>
+                                    <span class="block text-sm text-text-light-muted dark:text-text-dark-muted mt-1">456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh</span>
+                                </div>
+                            </label>
+                        </div>
                     </section>
                     <section
                         class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark p-6 sm:p-8 shadow-sm transition-colors duration-300">
@@ -97,7 +138,10 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                                 class="flex items-center p-4 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:border-primary dark:hover:border-primary transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
                                 <input checked="" class="text-primary focus:ring-primary" name="shippingMethod"
                                     type="radio" value="standard" />
-                                <div class="ml-3 flex-grow flex justify-between items-center">
+                                <div class="ml-4 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-primary">local_shipping</span>
+                                </div>
+                                <div class="ml-4 flex-grow flex justify-between items-center">
                                     <div>
                                         <span class="block font-medium text-text-light dark:text-text-dark">Giao Hàng
                                             Tiêu Chuẩn</span>
@@ -111,7 +155,10 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                                 class="flex items-center p-4 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:border-primary dark:hover:border-primary transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
                                 <input class="text-primary focus:ring-primary" name="shippingMethod" type="radio"
                                     value="express" />
-                                <div class="ml-3 flex-grow flex justify-between items-center">
+                                <div class="ml-4 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-primary">airport_shuttle</span>
+                                </div>
+                                <div class="ml-4 flex-grow flex justify-between items-center">
                                     <div>
                                         <span class="block font-medium text-text-light dark:text-text-dark">Giao Hàng
                                             Hỏa Tốc</span>
@@ -137,13 +184,14 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                                     class="flex items-center p-4 cursor-pointer hover:bg-background-light dark:hover:bg-background-dark transition-colors has-[:checked]:bg-primary/5">
                                     <input checked="" class="text-primary focus:ring-primary" name="paymentMethod"
                                         type="radio" value="cod" />
+                                    <div class="ml-4 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
+                                        <span class="material-symbols-outlined">payments</span>
+                                    </div>
                                     <span class="ml-3 font-medium text-text-light dark:text-text-dark flex-grow">Thanh
                                         toán khi nhận hàng (COD)</span>
-                                    <span
-                                        class="material-symbols-outlined text-text-light-muted dark:text-text-dark-muted">payments</span>
                                 </label>
                                 <div
-                                    class="px-4 pb-4 pt-0 ml-7 text-sm text-text-light-muted dark:text-text-dark-muted">
+                                    class="px-4 pb-4 pt-0 ml-[4.5rem] text-sm text-text-light-muted dark:text-text-dark-muted">
                                     Quý khách sẽ thanh toán bằng tiền mặt khi nhân viên giao hàng giao hoa đến nơi.
                                 </div>
                             </div>
@@ -153,10 +201,11 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                                     class="flex items-center p-4 cursor-pointer hover:bg-background-light dark:hover:bg-background-dark transition-colors has-[:checked]:bg-primary/5">
                                     <input class="text-primary focus:ring-primary peer" name="paymentMethod"
                                         type="radio" value="bank" />
+                                    <div class="ml-4 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-green-50 text-green-500 dark:bg-green-500/10 dark:text-green-400">
+                                        <span class="material-symbols-outlined">account_balance</span>
+                                    </div>
                                     <span class="ml-3 font-medium text-text-light dark:text-text-dark flex-grow">Chuyển
                                         khoản ngân hàng</span>
-                                    <span
-                                        class="material-symbols-outlined text-text-light-muted dark:text-text-dark-muted">account_balance</span>
                                 </label>
                             </div>
                             <div
@@ -165,10 +214,37 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
                                     class="flex items-center p-4 cursor-pointer hover:bg-background-light dark:hover:bg-background-dark transition-colors has-[:checked]:bg-primary/5">
                                     <input class="text-primary focus:ring-primary" name="paymentMethod" type="radio"
                                         value="momo" />
+                                    <div class="ml-4 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#a50064]/10 dark:bg-[#a50064]/20 p-1">
+                                        <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png" alt="Momo" class="w-full h-full object-contain" />
+                                    </div>
                                     <span class="ml-3 font-medium text-text-light dark:text-text-dark flex-grow">Thanh
-                                        toán qua Ví Momo / ZaloPay</span>
-                                    <span
-                                        class="material-symbols-outlined text-text-light-muted dark:text-text-dark-muted">wallet</span>
+                                        toán qua Ví Momo</span>
+                                </label>
+                            </div>
+                            <div
+                                class="border border-border-light dark:border-border-dark rounded-lg overflow-hidden transition-colors has-[:checked]:border-primary">
+                                <label
+                                    class="flex items-center p-4 cursor-pointer hover:bg-background-light dark:hover:bg-background-dark transition-colors has-[:checked]:bg-primary/5">
+                                    <input class="text-primary focus:ring-primary" name="paymentMethod" type="radio"
+                                        value="zalo" />
+                                    <div class="ml-4 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#005BA6]/10 dark:bg-[#005BA6]/20 p-1">
+                                        <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png" alt="ZaloPay" class="w-full h-full object-contain rounded-md" />
+                                    </div>
+                                    <span class="ml-3 font-medium text-text-light dark:text-text-dark flex-grow">Thanh
+                                        toán qua ZaloPay</span>
+                                </label>
+                            </div>
+                            <div
+                                class="border border-border-light dark:border-border-dark rounded-lg overflow-hidden transition-colors has-[:checked]:border-primary">
+                                <label
+                                    class="flex items-center p-4 cursor-pointer hover:bg-background-light dark:hover:bg-background-dark transition-colors has-[:checked]:bg-primary/5">
+                                    <input class="text-primary focus:ring-primary" name="paymentMethod" type="radio"
+                                        value="vnpay" />
+                                    <div class="ml-4 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border border-border-light dark:border-border-dark p-1 bg-white">
+                                        <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPay" class="w-full h-full object-contain" />
+                                    </div>
+                                    <span class="ml-3 font-medium text-text-light dark:text-text-dark flex-grow">Thanh
+                                        toán qua VNPay</span>
                                 </label>
                             </div>
                         </div>

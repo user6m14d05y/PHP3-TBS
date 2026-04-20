@@ -11,13 +11,13 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
     <div
         class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-300 antialiased min-h-screen flex flex-col">
 
-        <section class="bg-surface-light dark:bg-gray-800 py-12 md:py-20 transition-colors duration-300">
+        <section class="bg-pink-100 border-b border-gray-100 py-24 transition-colors duration-300">
             <div class="container mx-auto px-4 text-center">
-                <p class="text-primary text-sm font-bold tracking-[0.2em] uppercase mb-4">GIỎ HÀNG CỦA BẠN</p>
-                <h1
-                    class="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 dark:text-white italic">
+                <span class="text-xs uppercase tracking-[0.4em] mb-4 block font-medium text-pink-600">GIỎ HÀNG CỦA
+                    BẠN</span>
+                <h1 class="font-display text-5xl md:text-7xl font-bold text-white mb-6 italic leading-tight">
                     Giỏ Hàng</h1>
-                <p class="text-text-muted-light dark:text-text-muted-dark max-w-2xl mx-auto text-lg leading-relaxed">
+                <p class="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">
                     Kiểm tra lại các lựa chọn tuyệt vời của bạn trước khi tiến hành thanh toán.
                 </p>
             </div>
@@ -29,7 +29,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                         <div
                             class="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden transition-colors duration-300">
                             <div
-                                class="hidden md:grid grid-cols-12 gap-4 p-6 border-b border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-sm font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider">
+                                class="hidden md:grid grid-cols-12 gap-4 p-6 border-b border-border-light dark:border-border-dark bg-gray-50 text-sm font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider">
                                 <div class="col-span-6">Sản phẩm</div>
                                 <div class="col-span-2 text-center">Giá</div>
                                 <div class="col-span-2 text-center">Số lượng</div>
@@ -40,7 +40,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                                 <div class="col-span-6 flex items-center w-full gap-4">
                                     <button aria-label="Remove item"
                                         class="text-gray-400 hover:text-red-500 transition-colors hidden md:block">
-                                        <span class="material-icons text-lg">close</span>
+                                        <span class="material-symbols-outlined text-lg">close</span>
                                     </button>
                                     <img alt="Bó hoa hồng đỏ" class="w-20 h-24 object-cover rounded bg-gray-100"
                                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUYpnBoSn20lvTP2OPQiQSK7ySK26TWS0dW74JJoQjMX_MqByIVTRIXvBzvDG9YXC2bOJlWyUoUdV_Trd9asAzFxPK_GiwSIY3_bvOhxszJUHT8gx3Ag4XFk4D468mVWvTFXWa-O0gCiDqh2oZa7z4JmU7eoWQ-BGi8VwZSJ5rS6TVGFImd2Qv1Mp_TTXem-DsD-YX9cB7iJn5Wqy-pLUDZhMsZXBjJeOoRVWKAUeiOaI_LmlTioxMOwVYjWtpXUrpjrKOoiBoKuE" />
@@ -65,14 +65,14 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                                         class="flex items-center border border-border-light dark:border-border-dark rounded bg-white dark:bg-surface-dark overflow-hidden">
                                         <button aria-label="Decrease quantity"
                                             class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-text-muted-light dark:text-text-muted-dark">
-                                            <span class="material-icons text-sm">remove</span>
+                                            <span class="material-symbols-outlined text-sm">remove</span>
                                         </button>
                                         <input aria-label="Quantity"
                                             class="w-10 h-8 text-center border-none focus:ring-0 text-sm bg-transparent font-medium p-0 text-text-main-light dark:text-text-main-dark"
                                             min="1" type="number" value="1" />
                                         <button aria-label="Increase quantity"
                                             class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-text-muted-light dark:text-text-muted-dark">
-                                            <span class="material-icons text-sm">add</span>
+                                            <span class="material-symbols-outlined text-sm">add</span>
                                         </button>
                                     </div>
                                 </div>
@@ -86,7 +86,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                                 <div class="col-span-6 flex items-center w-full gap-4">
                                     <button aria-label="Remove item"
                                         class="text-gray-400 hover:text-red-500 transition-colors hidden md:block">
-                                        <span class="material-icons text-lg">close</span>
+                                        <span class="material-symbols-outlined text-lg">close</span>
                                     </button>
                                     <img alt="Lẵng hoa chúc mừng" class="w-20 h-24 object-cover rounded bg-gray-100"
                                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9s7CzhUSm2EpCUz5E7yMmGGozxT0niO5Vx5uPcTljnj7JpqGB7P8xbPV6wI_RiKofbZ0baGYkEDl85jIezsZwWJ0_xjdKE7jAsCXq-kLNeVWwGxqHEY_gCTYB5WlvThuFYBxmgIgLFu7xZHCrrM9RyXmPAe9b0EY4Z7rgxCQUBa9KuYKYmel99KkyvbBDgxk9izJXPA1Bu1jO7MmYI7jqHsPJhV2O2F49OyHcQEOyuI3CH0WK4RKjT40Coa155n4qWfeBKnQfJkU" />
@@ -107,14 +107,14 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                                         class="flex items-center border border-border-light dark:border-border-dark rounded bg-white dark:bg-surface-dark overflow-hidden">
                                         <button aria-label="Decrease quantity"
                                             class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-text-muted-light dark:text-text-muted-dark">
-                                            <span class="material-icons text-sm">remove</span>
+                                            <span class="material-symbols-outlined text-sm">remove</span>
                                         </button>
                                         <input aria-label="Quantity"
                                             class="w-10 h-8 text-center border-none focus:ring-0 text-sm bg-transparent font-medium p-0 text-text-main-light dark:text-text-main-dark"
                                             min="1" type="number" value="1" />
                                         <button aria-label="Increase quantity"
                                             class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-text-muted-light dark:text-text-muted-dark">
-                                            <span class="material-icons text-sm">add</span>
+                                            <span class="material-symbols-outlined text-sm">add</span>
                                         </button>
                                     </div>
                                 </div>
@@ -126,13 +126,12 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                             </div>
                         </div>
                         <div class="flex justify-between items-center mt-6">
-                            <a class="text-sm font-medium hover:text-primary transition-colors flex items-center gap-2"
-                                href="#">
-                                <span class="material-icons text-sm">arrow_back</span>
+                            <router-link :to="{ name: 'product' }" class="text-sm font-medium hover:text-primary transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span>
                                 Tiếp tục mua sắm
-                            </a>
+                            </router-link>
                             <button
-                                class="text-sm font-medium border border-border-light dark:border-border-dark px-4 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                class="text-sm font-medium border border-border-light px-6 py-3 rounded hover:bg-pink-500 hover:text-white transition-colors">
                                 Cập nhật giỏ hàng
                             </button>
                         </div>
@@ -158,10 +157,10 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                                     for="coupon">Mã giảm giá (Nếu có)</label>
                                 <div class="flex">
                                     <input
-                                        class="form-input flex-grow rounded-l-md border-r-0 border-border-light dark:border-border-dark bg-white dark:bg-gray-800 focus:ring-primary focus:border-primary text-sm dark:text-white"
+                                        class="form-input flex-grow rounded-l-md border-r-0 border-border-light bg-white dark:bg-gray-100 focus:ring-primary focus:border-primary text-sm dark:text-gray-800"
                                         id="coupon" placeholder="Nhập mã..." type="text" />
                                     <button
-                                        class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-r-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-gray-500 transition-colors">
+                                        class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-r-md text-sm font-medium hover:bg-pink-500 dark:hover:bg-pink-500 transition-colors">
                                         Áp dụng
                                     </button>
                                 </div>
@@ -188,16 +187,17 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
     <Footer_Client />
 </template>
 <style scoped>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        .font-display {
-            font-family: 'Playfair Display', serif;
-        }
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+    font-family: 'Playfair Display', serif;
+}
 </style>

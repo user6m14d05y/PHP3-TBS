@@ -14,7 +14,7 @@ const SubmitContact = async () => {
   }
 
   try {
-    const reponse = await axios.post("http://127.0.0.1:8888/api/SubmitContact", {
+    const reponse = await axios.post("http://localhost:8888/api/SubmitContact", {
       email: email.value
     }); 
     if (reponse.data.status == "success"){
@@ -50,10 +50,10 @@ const SubmitContact = async () => {
           <div>
             <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-900 border-b border-pink-100 pb-2 inline-block">Hỗ Trợ</h3>
             <ul class="space-y-3 text-gray-500 text-sm">
-              <li><a href="#" class="hover:text-pink-600 transition">Chính Sách Giao Hoa</a></li>
-              <li><a href="#" class="hover:text-pink-600 transition">Đổi Trả & Hoàn Tiền</a></li>
-              <li><a href="#" class="hover:text-pink-600 transition">Hướng Dẫn Đặt Hàng</a></li>
-              <li><a href="#" class="hover:text-pink-600 transition">Liên Hệ Góp Ý</a></li>
+              <li><router-link to="/delivery-policy" class="hover:text-pink-600 transition">Chính Sách Giao Hoa</router-link></li>
+              <li><router-link to="/refund-policy" class="hover:text-pink-600 transition">Đổi Trả & Hoàn Tiền</router-link></li>
+              <li><router-link to="/ordering" class="hover:text-pink-600 transition">Hướng Dẫn Đặt Hàng</router-link></li>
+              <li><router-link to="/contact" class="hover:text-pink-600 transition">Liên Hệ Góp Ý</router-link></li>
             </ul>
           </div>
           <div>
