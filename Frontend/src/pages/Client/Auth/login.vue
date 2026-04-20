@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../../stores/auth';
 
 const email = ref('');
 const password = ref('');
@@ -11,6 +12,7 @@ const isSubmitting = ref(false);
 import Swal from 'sweetalert2';
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const login = async () => {
 
@@ -33,24 +35,10 @@ const login = async () => {
     if (response.data.status === "success"){
       // save token to storage
       localStorage.setItem('access_token', response.data.access_token);
-
-      // save user info to storage
-      localStorage.setItem('user', JSON.stringify({
-        isLoggedIn: true,
-        name: response.data.user.name,
-        email: response.data.user.email,
-        _r: btoa(response.data.user.role || 'user') 
-      }));
-
-      // Swal.fire({
-      //   toast: true,
-      //   position: 'top-end',
-      //   icon: 'success',
-      //   title: "Đăng nhập thành công!",
-      //   showConfirmButton: false,
-      //   timer: 1500,
-      //   timerProgressBar: true,
-      // })
+      
+      // Update Pinia state immediately to avoid reload issue
+      authStore.user = response.data.user;
+      authStore.isLoaded = true;
       
       if (response.data.user.role === 'admin') {
          router.replace('/admin/dashboard');

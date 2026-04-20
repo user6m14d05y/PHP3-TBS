@@ -1,38 +1,27 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '../../../stores/auth';
 
 const router = useRouter();
-const isLoggedIn = ref(false);
-const name = ref('');
-const role = ref('');
+const authStore = useAuthStore();
 
-onMounted(() => {
-    const userSession = localStorage.getItem('user');
-    if (userSession) {
-        const userData = JSON.parse(userSession);
-        isLoggedIn.value = userData.isLoggedIn;
-        name.value = userData.name;
-        role.value = userData.role;
-    }
-});
+// Trạng thái sẽ tự động cập nhật (Reactive) từ State Pinia
+const isLoggedIn = computed(() => !!authStore.user);
+const name = computed(() => authStore.user?.name || '');
+// const role = computed(() => authStore.user?.role || '');
 
 const logout = async () => {
     try {
         const token = localStorage.getItem('access_token');
-        await axios.post('http://127.0.0.1:8888/api/Logout', {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+        await axios.post('http://localhost:8888/api/Logout', {}, {
+            headers: { Authorization: `Bearer ${token}` }
         }); 
     } catch (error) {
         console.error("Lỗi logout server:", error);
     } finally {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
-        isLoggedIn.value = false;
-        name.value = '';
+        authStore.logout(); // Dọn dẹp token ở store
         router.replace('/');
     }
 };
@@ -54,10 +43,10 @@ const logout = async () => {
             <button class="text-gray-500 hover:text-pink-600 transition">
               <i class="fa-solid fa-magnifying-glass text-xl"></i>
             </button>
-            <button class="text-gray-500 hover:text-pink-600 transition relative">
+            <router-link replace to="/cart" class="text-gray-500 hover:text-pink-600 transition relative">
               <i class="fa-solid fa-bag-shopping text-xl"></i>
               <span class="absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
-            </button>
+            </router-link>
             <router-link v-if="!isLoggedIn" to="/login" class="text-gray-500 hover:text-pink-600 transition relative">
               <i class="fa-regular fa-user text-xl"></i>
             </router-link>

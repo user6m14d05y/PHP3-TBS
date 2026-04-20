@@ -27,7 +27,7 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 86400, 
+    'max_age' => env('CORS_MAX_AGE'),
 
     'supports_credentials' => true,
 
