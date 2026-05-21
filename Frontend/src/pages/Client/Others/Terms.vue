@@ -20,10 +20,10 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                     </div>
                     <div class="flex items-center space-x-6">
                         <button class="text-gray-400 hover:text-primary transition-colors">
-                            <span class="material-icons">search</span>
+                            <span class="material-symbols-outlined">search</span>
                         </button>
                         <button class="text-gray-400 hover:text-primary transition-colors relative">
-                            <span class="material-icons">shopping_bag</span>
+                            <span class="material-symbols-outlined">shopping_bag</span>
                             <span
                                 class="absolute -top-1 -right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">2</span>
                         </button>

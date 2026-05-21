@@ -24,6 +24,8 @@ services:
     depends_on:
       db:
         condition: service_healthy  # Chờ MySQL sẵn sàng mới start PHP
+      redis:
+        condition: service_started
 
   # 3. Container Web Server (Nginx)
   webserver:
@@ -37,7 +39,16 @@ services:
     depends_on:
       - app
 
-  # 4. Container Database (MySQL) — có tuning config
+  # 4. Container Redis (Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: redis-tbs
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+  # 5. Container Database (MySQL) — có tuning config
   db:
     image: mysql:8.0
     container_name: mysql-tbs
@@ -59,4 +70,5 @@ services:
 
 volumes:
   db_data:
+  redis_data:
   frontend_node_modules:  # Named volume cho node_modules — tránh reinstall

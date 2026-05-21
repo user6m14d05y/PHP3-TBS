@@ -80,7 +80,7 @@ const router = createRouter({
       component: () => import('../pages/Client/Home/productDetail.vue')
     },
     {
-      path: '/admin/dashboard',
+      path: '/admin',
       name: 'admin-dashboard',
       component: () => import('../pages/Admin/dashboard.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
@@ -134,6 +134,14 @@ const router = createRouter({
       component: () => import('../pages/NotFound404/index.vue')
     },
   ],
+  // Product detail scroll to top
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0, behavior: 'smooth' }
+    }
+  }
 })
 
 router.beforeEach(async (to, from) => {

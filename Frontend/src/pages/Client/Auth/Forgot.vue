@@ -13,20 +13,17 @@ const handleForgotPassword = () => {
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
     <div class="max-w-4xl w-full flex bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[500px]">
       
-      <!-- Left side: Image banner (Hidden on small screens) -->
-      <div class="hidden md:block md:w-1/2 relative">
-        <img 
-          class="absolute inset-0 h-full w-full object-cover grayscale-[20%]" 
-          src="https://i.pinimg.com/736x/52/f9/f5/52f9f51d22d69ec2ac3c75c62c8f3e3f.jpg" 
-          alt="Fashion Detail" 
-        />
-        <div class="absolute inset-0 bg-black bg-opacity-20 transition-opacity duration-300 hover:bg-opacity-30"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-        
-        <div class="absolute bottom-0 left-0 p-10 text-white">
-          <h2 class="text-4xl font-serif font-bold mb-3 tracking-wide">TBS</h2>
+      <!-- Left side: Brand banner (Hidden on small screens) -->
+      <div class="hidden md:flex md:w-1/2 relative overflow-hidden bg-gradient-to-br from-pink-600 via-rose-500 to-pink-300">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_30%),radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.25),transparent_28%)]"></div>
+        <div class="relative z-10 flex h-full flex-col justify-end p-10 text-white">
+          <router-link to="/" class="mb-auto inline-flex items-center gap-3 text-white">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-xl font-bold backdrop-blur">T</span>
+            <span class="text-sm font-semibold uppercase tracking-[0.3em]">TBS Flower</span>
+          </router-link>
+          <h2 class="text-4xl font-serif font-bold mb-3 tracking-wide">Khôi phục tài khoản</h2>
           <p class="text-sm opacity-90 font-light tracking-wider leading-relaxed">
-            Khôi phục quyền truy cập vào tài khoản của bạn.
+            Nhập email đã đăng ký để nhận hướng dẫn lấy lại mật khẩu và tiếp tục đặt hoa tại TBS.
           </p>
         </div>
       </div>
@@ -64,7 +61,7 @@ const handleForgotPassword = () => {
           <div class="pt-2">
             <button 
               type="submit" 
-              class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition active:scale-[0.98] duration-200 ease-in-out"
+              class="group relative w-full overflow-hidden rounded-full bg-gradient-to-r from-pink-600 via-rose-500 to-pink-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-pink-200/70 transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 active:translate-y-0 active:scale-[0.98]"
             >
               Gửi liên kết đặt lại
             </button>
@@ -73,7 +70,7 @@ const handleForgotPassword = () => {
 
         <!-- Back to Login Link -->
         <div class="mt-8 text-center text-sm">
-          <router-link to="/login" class="flex items-center justify-center text-gray-600 hover:text-gray-900 transition duration-150 font-medium">
+          <router-link to="/login" class="inline-flex items-center justify-center rounded-full border border-pink-100 bg-pink-50 px-4 py-2 font-semibold text-pink-600 transition duration-200 hover:border-pink-200 hover:bg-pink-100 hover:text-pink-700">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>

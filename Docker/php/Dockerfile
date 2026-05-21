@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
  && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
+RUN pecl install redis \
+ && docker-php-ext-enable redis \
+ && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
 # ─── OPcache: tăng tốc PHP tối đa ────────────────────────────────────────────
 # validate_timestamps=0 → không stat() filesystem mỗi request (quan trọng nhất
@@ -35,6 +37,9 @@ RUN { \
 RUN { \
     echo 'realpath_cache_size=4096K'; \
     echo 'realpath_cache_ttl=600'; \
+    echo 'upload_max_filesize=32M'; \
+    echo 'post_max_size=64M'; \
+    echo 'max_file_uploads=30'; \
 } > /usr/local/etc/php/conf.d/performance.ini
 
 # ─── PHP-FPM pool: file riêng để không conflict www.conf ─────────────────────

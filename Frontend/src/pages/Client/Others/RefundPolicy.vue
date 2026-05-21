@@ -87,7 +87,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                     <h3 class="text-2xl font-bold text-gray-900 mb-3">Cần hỗ trợ nhanh?</h3>
                     <p class="mb-6 text-gray-600">Liên hệ bộ phận CSKH để được giải quyết ngay lập tức.</p>
                     <a class="inline-flex items-center justify-center px-6 py-3 rounded-full text-white bg-pink-600 hover:bg-pink-700 font-semibold transition-colors" href="tel:1900xxxx">
-                        <span class="material-icons mr-2 text-sm">phone</span> Hotline: 1900 xxxx
+                        <span class="material-symbols-outlined mr-2 text-sm">phone</span> Hotline: 1900 xxxx
                     </a>
                 </section>
             </div>
