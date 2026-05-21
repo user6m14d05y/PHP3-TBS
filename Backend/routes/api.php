@@ -56,7 +56,7 @@ Route::delete('/size/{id}', [SizeController::class, 'destroy']);
 
 // Product routes
 Route::get('/product', [ProductController::class, 'index']);
-Route::get('/product/{id}', [ProductController::class, 'show']);
+Route::get('/product/{slug}', [ProductController::class, 'show']);
 Route::post('/product', [ProductController::class, 'store']);
 Route::post('/product/update/{id}', [ProductController::class, 'update']);
 Route::delete('/product/{id}', [ProductController::class, 'destroy']);

@@ -14,10 +14,16 @@ class CategoryItemController extends Controller
     public function index(Request $request)
     {
         if ($request->has('category_id')) {
-            $items = CategoryItem::where('category_id', $request->category_id)->get();
+            $items = CategoryItem::select('id', 'category_id', 'name')
+                ->where('category_id', $request->category_id)
+                ->orderBy('id')
+                ->get();
         } else {
             // Lấy tất cả, kèm thông tin danh mục cha luôn
-            $items = CategoryItem::with('category')->get();
+            $items = CategoryItem::select('id', 'category_id', 'name')
+                ->with('category:id,name,img')
+                ->orderBy('category_id')
+                ->get();
         }
          return response()->json([
             'status' => 'success',

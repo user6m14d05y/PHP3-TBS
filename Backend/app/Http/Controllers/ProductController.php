@@ -13,24 +13,26 @@ class ProductController extends Controller
     // GET /api/product — Lấy tất cả sản phẩm kèm variants và images
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'categoryItem', 'variants.size', 'images'])
-            ->where('is_active', 1);
+        $limit = max(1, min($request->integer('limit', 12), 50));
 
-        // Lọc theo danh mục cha
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Lọc theo danh mục con
-        if ($request->has('category_item_id')) {
-            $query->where('category_item_id', $request->category_item_id);
-        }
-
-        $query->orderBy('created_at', 'desc');
-
-        // Phân trang
-        $limit = $request->get('limit', 12);
-        $products = $query->paginate($limit);
+        $products = Product::query()
+            ->select('id', 'category_id', 'category_item_id', 'name', 'slug', 'description', 'thumbnail', 'is_active', 'created_at', 'updated_at')
+            ->with([
+                'category:id,name,img',
+                'categoryItem:id,category_id,name',
+                'variants:id,product_id,size_id,price,sale_price,stock,is_active',
+                'variants.size:id,name',
+                'images:id,product_id,image_path,is_main,sort_order',
+            ])
+            ->where('is_active', true)
+            ->when($request->filled('category_id'), function ($query) use ($request) {
+                $query->where('category_id', $request->integer('category_id'));
+            })
+            ->when($request->filled('category_item_id'), function ($query) use ($request) {
+                $query->where('category_item_id', $request->integer('category_item_id'));
+            })
+            ->latest('id')
+            ->paginate($limit);
 
         return response()->json([
             'status' => 'success',
@@ -43,10 +45,15 @@ class ProductController extends Controller
     }
 
 
-    // GET /api/product/{id} — Lấy 1 sản phẩm
-    public function show($id)
+    // GET /api/product/{slug} — Lấy 1 sản phẩm theo slug, hỗ trợ id cho link cũ
+    public function show($slug)
     {
-        $product = Product::with(['category', 'categoryItem', 'variants.size', 'images'])->find($id);
+        $product = Product::with(['category', 'categoryItem', 'variants.size', 'images'])
+            ->where('slug', $slug)
+            ->when(is_numeric($slug), function ($query) use ($slug) {
+                $query->orWhere('id', $slug);
+            })
+            ->first();
 
         if (!$product) {
             return response()->json(['message' => 'Không tìm thấy sản phẩm'], 404);
@@ -128,8 +135,11 @@ class ProductController extends Controller
             return response()->json(['message' => 'Không tìm thấy sản phẩm'], 404);
         }
 
-        $product->name             = $request->name ?? $product->name;
-        $product->slug             = Str::slug($request->name ?? $product->name) . '-' . $product->id;
+        if ($request->filled('name') && $request->name !== $product->name) {
+            $product->name = $request->name;
+            $product->slug = Str::slug($request->name) . '-' . $product->id;
+        }
+
         $product->description      = $request->description ?? $product->description;
         $product->category_id      = $request->category_id ?? $product->category_id;
         $product->category_item_id = $request->category_item_id ?? $product->category_item_id;

@@ -34,6 +34,18 @@ const toggleTheme = () => {
     isDark.value = !isDark.value;
     localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
 };
+
+const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes} ${day}/${month}/${year}`;
+};
 </script>
 
 <template>
@@ -96,7 +108,9 @@ const toggleTheme = () => {
                                         <td class="px-6 py-4">{{ index + 1 }}</td>
                                         <td class="px-6 py-4 font-medium">{{ user.name }}</td>
                                         <td class="px-6 py-4">{{ user.email }}</td>
-                                        <td class="px-6 py-4">{{ user.created_at }}</td>
+                                        <td class="px-6 py-4 text-sm font-medium tabular-nums" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                                             {{ formatDate(user.created_at) }}
+                                         </td>
                                         <td class="px-6 py-4">
                                             <span :class="user.role === 'admin'
                                                 ? 'bg-purple-100 text-purple-700'

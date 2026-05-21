@@ -51,9 +51,40 @@ const logout = async () => {
               <i class="fa-regular fa-user text-xl"></i>
             </router-link>
             
-            <div v-else class="hidden md:flex items-center space-x-4 ml-4 pl-4 border-l border-gray-200">
-                <span class="text-sm font-semibold text-gray-800">Hi, {{ name }}</span>
-                <button @click="logout" class="text-sm font-medium text-gray-500 hover:text-pink-600 transition">Đăng xuất</button>
+            <div v-else class="relative group hidden md:flex items-center space-x-4 ml-4 pl-4 border-l border-gray-200 cursor-pointer py-2">
+                <div class="text-sm font-semibold text-gray-800">Hi, {{ name }}</div>
+                 <!-- Dropdown -->
+                <div
+                    class="absolute right-0 top-full mt-1 w-56 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    <div>
+                        <!-- Profile -->
+                        <router-link to="/profile"
+                            class="flex items-center px-4 py-4 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                            <i class="fa-regular fa-user mr-2"></i>
+                            Tài khoản
+                        </router-link>
+                    </div>
+
+                    <div v-if="role === 'admin'" class="border-t border-gray-100 my-1"></div>
+
+                    <!-- Admin -->
+                    <div v-if="role === 'admin'">
+                        <router-link to="/admin/dashboard"
+                            class="flex items-center px-4 py-4 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                            <i class="fa-solid fa-user-tie mr-2"></i>
+                            Admin
+                        </router-link>
+                    </div>
+
+                    <div>
+                        <!-- Logout -->
+                        <button @click="logout"
+                            class="w-full flex items-center px-4 py-3 text-sm text-left text-red-600 hover:bg-gray-50 hover:text-red-700 transition-colors">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                            Đăng xuất
+                        </button>
+                    </div>
+                </div>
             </div>
           </div>
         </div>

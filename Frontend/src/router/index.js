@@ -75,11 +75,10 @@ const router = createRouter({
       component: () => import('../pages/Client/Auth/Profile.vue')
     },
     {
-      path: '/product/category/:id',
-      name: 'product-category',
-      component: () => import('../pages/Client/Home/categoryProduct.vue')
+      path: '/product/:slug',
+      name: 'product-detail',
+      component: () => import('../pages/Client/Home/productDetail.vue')
     },
-
     {
       path: '/admin/dashboard',
       name: 'admin-dashboard',
@@ -127,6 +126,12 @@ const router = createRouter({
       name: 'admin-order',
       component: () => import('../pages/Admin/order.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    // NOT FOUND 404
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../pages/NotFound404/index.vue')
     },
   ],
 })
