@@ -36,7 +36,7 @@ const form = ref({
 // ========== FETCH DATA ==========
 const fetchProducts = async () => {
     try {
-        const res = await axios.get('http://127.0.0.1:8888/api/product');
+        const res = await axios.get('http://localhost:8888/api/product');
         products.value = res.data.data;
     } catch (e) {
         console.error('Lỗi khi tải sản phẩm:', e);
@@ -45,7 +45,7 @@ const fetchProducts = async () => {
 
 const fetchCategories = async () => {
     try {
-        const res = await axios.get('http://127.0.0.1:8888/api/category');
+        const res = await axios.get('http://localhost:8888/api/category');
         categories.value = res.data.data;
     } catch (e) {
         console.error('Lỗi khi tải danh mục:', e);
@@ -55,7 +55,7 @@ const fetchCategories = async () => {
 const fetchCategoryItems = async (categoryId) => {
     if (!categoryId) { categoryItems.value = []; return; }
     try {
-        const res = await axios.get(`http://127.0.0.1:8888/api/category-item?category_id=${categoryId}`);
+        const res = await axios.get(`http://localhost:8888/api/category-item?category_id=${categoryId}`);
         categoryItems.value = res.data.data;
     } catch (e) {
         console.error('Lỗi khi tải danh mục con:', e);
@@ -64,7 +64,7 @@ const fetchCategoryItems = async (categoryId) => {
 
 const fetchSizes = async () => {
     try {
-        const res = await axios.get('http://127.0.0.1:8888/api/size');
+        const res = await axios.get('http://localhost:8888/api/size');
         sizes.value = res.data.data;
     } catch (e) {
         console.error('Lỗi khi tải size:', e);
@@ -100,7 +100,7 @@ const openEditModal = async (product) => {
     form.value.category_item_id = product.category_item_id || '';
     form.value.is_active        = product.is_active;
     form.value.thumbnailPreview = product.thumbnail
-        ? `http://127.0.0.1:8888/images/${product.thumbnail}`
+        ? `http://localhost:8888/images/${product.thumbnail}`
         : null;
     form.value.existingImages   = product.images || [];
 
@@ -158,7 +158,7 @@ const removeExistingImage = async (image, index) => {
     if (!confirm.isConfirmed) return;
 
     try {
-        await axios.delete(`http://127.0.0.1:8888/api/product/image/${image.id}`);
+        await axios.delete(`http://localhost:8888/api/product/image/${image.id}`);
         form.value.existingImages.splice(index, 1);
         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Xóa ảnh thành công', showConfirmButton: false, timer: 2000 });
     } catch (e) {
@@ -209,11 +209,11 @@ const saveProduct = async () => {
 
     try {
         if (isEditMode.value) {
-            await axios.post(`http://127.0.0.1:8888/api/product/update/${editingId.value}`, formData, {
+            await axios.post(`http://localhost:8888/api/product/update/${editingId.value}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
         } else {
-            await axios.post('http://127.0.0.1:8888/api/product', formData, {
+            await axios.post('http://localhost:8888/api/product', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
         }
@@ -246,7 +246,7 @@ const deleteProduct = async (id) => {
     if (!result.isConfirmed) return;
 
     try {
-        await axios.delete(`http://127.0.0.1:8888/api/product/${id}`);
+        await axios.delete(`http://localhost:8888/api/product/${id}`);
         await fetchProducts();
         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Xóa sản phẩm thành công!', showConfirmButton: false, timer: 3000, timerProgressBar: true });
     } catch (e) {
@@ -337,7 +337,7 @@ onMounted(() => {
                                         <td class="px-4 py-4">
                                             <div class="w-14 h-14 rounded-lg overflow-hidden border" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
                                                 <img v-if="product.thumbnail"
-                                                    :src="`http://127.0.0.1:8888/images/${product.thumbnail}`"
+                                                    :src="`http://localhost:8888/images/${product.thumbnail}`"
                                                     class="w-full h-full object-cover" :alt="product.name" />
                                                 <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
 
@@ -483,7 +483,7 @@ onMounted(() => {
                                         <div v-for="(img, idx) in form.existingImages" :key="img.id"
                                             class="relative w-20 h-20 rounded-xl overflow-hidden border-2 group"
                                             :class="isDark ? 'border-gray-600' : 'border-gray-200'">
-                                            <img :src="`http://127.0.0.1:8888/images/${img.image_path}`" class="w-full h-full object-cover" />
+                                            <img :src="`http://localhost:8888/images/${img.image_path}`" class="w-full h-full object-cover" />
                                             <button @click="removeExistingImage(img, idx)"
 
                                                 class="absolute inset-0 bg-red-500/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">

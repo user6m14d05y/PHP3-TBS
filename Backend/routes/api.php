@@ -22,12 +22,10 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/Login', [AuthController::class, 'login']);
 Route::post('/SubmitContact', [ContactController::class, 'SubmitContact']);
-// Route::middleware('auth:sanctum')->post('/Logout', [AuthController::class, 'Logout']);
+Route::middleware('auth:sanctum')->post('/Logout', [AuthController::class, 'Logout']);
 
 
 // ADMIN
-
-Route::middleware('auth:sanctum')->group(function () {
 
 // User routers
 Route::get('/user', [AuthController::class, 'index']);
@@ -63,12 +61,10 @@ Route::post('/product', [ProductController::class, 'store']);
 Route::post('/product/update/{id}', [ProductController::class, 'update']);
 Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 Route::delete('/product/image/{imageId}', [ProductController::class, 'destroyImage']);
-    
-});
 
 
 
-// User info (lấy user đang đăng nhập)
+// User info (get user login)
 Route::get('/me', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');

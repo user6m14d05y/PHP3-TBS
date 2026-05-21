@@ -21,7 +21,7 @@ const savePrice = ref([]);
 // Fetch data
 const fetchAllCategories = async () => {
     try {
-        const res = await axios.get('http://127.0.0.1:8888/api/category')
+        const res = await axios.get('http://localhost:8888/api/category')
         categories.value = res.data.data;
         const findcategory_item = categories.value.find(item => item.id == selectURLId.value);
         if (findcategory_item) {
@@ -34,7 +34,7 @@ const fetchAllCategories = async () => {
 
 const fetchCategoryItem = async () => {
     try {
-        const res = await axios.get(`http://127.0.0.1:8888/api/category-item?category_id=${selectURLId.value}`)
+        const res = await axios.get(`http://localhost:8888/api/category-item?category_id=${selectURLId.value}`)
         categories_item.value = res.data.data;
     } catch (error) {
         console.error('Error fetching categories:', error);
@@ -43,7 +43,7 @@ const fetchCategoryItem = async () => {
 
 const fetchProducts = async () => {
     try {
-        const res = await axios.get('http://127.0.0.1:8888/api/product?category_id=' + selectURLId.value)
+        const res = await axios.get('http://localhost:8888/api/product?category_id=' + selectURLId.value)
         products.value = res.data.data;
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -181,7 +181,7 @@ onMounted(() => {
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
                     <div v-for="product in products" :key="product.id" class="group cursor-pointer">
                         <div class="relative h-80 mb-4 overflow-hidden bg-gray-100">
-                            <img :src="'http://127.0.0.1:8888/images/' + product.thumbnail" :alt="product.name"
+                            <img :src="'http://localhost:8888/images/' + product.thumbnail" :alt="product.name"
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
                             <div
                                 class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition duration-300">

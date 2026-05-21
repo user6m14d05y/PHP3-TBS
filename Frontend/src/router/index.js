@@ -44,7 +44,36 @@ const router = createRouter({
       name: 'order-success',
       component: () => import('../pages/Client/Cart/OrderSuccess.vue')
     },
-    
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('../pages/Client/Others/Contact.vue')
+    },
+    {
+      path: '/delivery-policy',
+      name: 'delivery-policy',
+      component: () => import('../pages/Client/Others/DeliveryPolicy.vue')
+    },
+    {
+      path: '/refund-policy',
+      name: 'refund-policy',
+      component: () => import('../pages/Client/Others/RefundPolicy.vue')
+    },
+    {
+      path: '/ordering',
+      name: 'ordering',
+      component: () => import('../pages/Client/Others/Ordering.vue')
+    },
+    {
+      path: '/terms',
+      name: 'terms',
+      component: () => import('../pages/Client/Others/Terms.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../pages/Client/Auth/Profile.vue')
+    },
     {
       path: '/product/category/:id',
       name: 'product-category',

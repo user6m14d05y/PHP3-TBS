@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
 import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
 </script>
@@ -96,80 +95,6 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                 </a>
             </div>
         </main>
-        <footer
-            class="bg-surface-light dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-3xl font-display font-bold text-green-700 dark:text-green-500">T</span>
-                            <span class="text-3xl font-display font-bold text-red-600 dark:text-red-500">B</span>
-                            <span class="text-3xl font-display font-bold text-green-700 dark:text-green-500">S</span>
-                        </div>
-                        <p class="text-text-muted-light dark:text-text-muted-dark text-sm leading-relaxed">
-                            Nơi hội tụ những nhành hoa tươi thắm và tinh tế nhất, mang tâm tình gửi gắm vào từng nhành
-                            hoa nghệ thuật.
-                        </p>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white mb-4 uppercase text-sm tracking-wider">Sản
-                            Phẩm</h3>
-                        <ul class="space-y-3">
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Hoa Bó Mới Về</a></li>
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Hoa Khai Trương</a></li>
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Vòng Hoa Chia Buồn</a></li>
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Dịch Vụ Điện Hoa</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white mb-4 uppercase text-sm tracking-wider">Hỗ Trợ
-                        </h3>
-                        <ul class="space-y-3">
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Chính Sách Giao Hoa</a></li>
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Đổi Trả &amp; Hoàn Tiền</a></li>
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Hướng Dẫn Đặt Hàng</a></li>
-                            <li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors"
-                                    href="#">Liên Hệ Góp Ý</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white mb-4 uppercase text-sm tracking-wider">Đăng
-                            Ký Nhận Tin</h3>
-                        <p class="text-text-muted-light dark:text-text-muted-dark text-sm mb-4">
-                            Để nhận ưu đãi đặc biệt và các mẫu hoa mới nhất hàng tuần.
-                        </p>
-                        <form class="relative">
-                            <input
-                                class="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:ring-0 px-0 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400"
-                                placeholder="Email của bạn..." type="email" />
-                            <button class="absolute right-0 top-2 text-primary hover:text-primary/80 transition-colors"
-                                type="submit">
-                                <span class="material-icons text-xl">send</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <div
-                    class="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-xs text-text-muted-light dark:text-text-muted-dark">
-                        © 2026 TBS FLORA STORE. LAN TỎA YÊU THƯƠNG BẰNG HOA TƯƠI.
-                    </p>
-                    <div class="flex gap-6 text-xs text-text-muted-light dark:text-text-muted-dark">
-                        <a class="hover:text-primary dark:hover:text-primary transition-colors" href="#">CHÍNH SÁCH BẢO
-                            MẬT</a>
-                        <a class="hover:text-primary dark:hover:text-primary transition-colors" href="#">ĐIỀU KHOẢN PHỤC
-                            VỤ</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
     <Footer_Client />
 </template>

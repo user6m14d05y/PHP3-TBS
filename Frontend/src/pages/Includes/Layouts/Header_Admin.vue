@@ -87,7 +87,7 @@ const logout = async () => {
                     class="absolute right-0 top-[100%] w-56 border rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                     <div class="py-2">
                         <!-- Profile -->
-                        <router-link to="/"
+                        <router-link to="/profile"
                             :class="isDark ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-black'"
                             class="flex items-center px-4 py-2 text-sm transition-colors">
                             <i class="fa-regular fa-user mr-2"></i>

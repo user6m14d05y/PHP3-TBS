@@ -14,7 +14,7 @@ const message = ref('');
 
 const fetchSize = async () => {
     try {
-        const response = await axios.get('http://127.0.0.1:8888/api/size');
+        const response = await axios.get('http://localhost:8888/api/size');
         sizes.value = response.data.data;
         if(message.value){
             Swal.fire({
@@ -65,7 +65,7 @@ const editSize = (size) => {
 const deleteSize = async (id) => {
     if (confirm("Bạn có chắc chắn muốn xóa cỡ bó này khỏi hệ thống?")) {
         try {
-            await axios.delete(`http://127.0.0.1:8888/api/size/${id}`);
+            await axios.delete(`http://localhost:8888/api/size/${id}`);
             fetchSize(); 
             message.value = "Xóa kích thước thành công!";
         } catch (error) {
@@ -82,10 +82,10 @@ const saveSize = async () => {
 
         if (sizeForm.value.id) {
             // Update existing Size
-            await axios.post(`http://127.0.0.1:8888/api/size/update/${sizeForm.value.id}`, sizeForm.value, config);
+            await axios.post(`http://localhost:8888/api/size/update/${sizeForm.value.id}`, sizeForm.value, config);
         } else {
             // Create new Size
-            await axios.post('http://127.0.0.1:8888/api/size', sizeForm.value, config);
+            await axios.post('http://localhost:8888/api/size', sizeForm.value, config);
         }
 
         isModalOpen.value = false;
