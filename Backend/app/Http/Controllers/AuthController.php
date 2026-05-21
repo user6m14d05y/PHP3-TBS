@@ -9,22 +9,56 @@ use Illuminate\Support\Facades\Hash; // ma hoa password
 class AuthController extends Controller
 {
 
-    public function index() {
-        $users = User::all();
-         return response()->json([
+    public function index(Request $request) {
+        $limit = max(1, min($request->integer('limit', 20), 100));
+
+        $users = User::query()
+            ->select('id', 'name', 'email', 'role', 'created_at', 'updated_at')
+            ->latest('id')
+            ->paginate($limit);
+
+        return response()->json([
             'status' => 'success',
-            'data'   => $users
+            'data' => $users->items(),
+            'total' => $users->total(),
+            'per_page' => $users->perPage(),
+            'current_page' => $users->currentPage(),
+            'last_page' => $users->lastPage(),
         ]);
     }
 
-    public function update(Request $request) {
-        $user = User::find($request->id);
-        $user->update([
+    public function update(Request $request, $id) {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy người dùng!'
+            ], 404);
+        }
+
+        // Block admin from self-changing role
+        $loggedInUser = auth('sanctum')->user() ?: $request->user();
+        if ($loggedInUser && (string)$user->id === (string)$loggedInUser->id) {
+            if ($request->role && $request->role !== $user->role) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bạn không được phép tự thay đổi vai trò (role) của chính mình!'
+                ], 403);
+            }
+        }
+
+        $data = [
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
             'role' => $request->role
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Cập nhật tài khoản thành công!'

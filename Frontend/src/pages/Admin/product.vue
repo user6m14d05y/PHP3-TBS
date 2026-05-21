@@ -13,6 +13,10 @@ const products   = ref([]);
 const categories = ref([]);
 const categoryItems = ref([]);
 const sizes      = ref([]);
+const currentPage = ref(1);
+const perPage = ref(12);
+const totalProducts = ref(0);
+const lastPage = ref(1);
 
 const isModalOpen = ref(false);
 const isEditMode  = ref(false);
@@ -34,13 +38,28 @@ const form = ref({
 });
 
 // ========== FETCH DATA ==========
-const fetchProducts = async () => {
+const fetchProducts = async (page = currentPage.value) => {
     try {
-        const res = await axios.get('http://localhost:8888/api/product');
+        const res = await axios.get('http://localhost:8888/api/product', {
+            params: {
+                page,
+                limit: perPage.value,
+            },
+        });
+
         products.value = res.data.data;
+        currentPage.value = res.data.current_page;
+        perPage.value = res.data.per_page;
+        totalProducts.value = res.data.total;
+        lastPage.value = res.data.last_page;
     } catch (e) {
         console.error('Lỗi khi tải sản phẩm:', e);
     }
+};
+
+const changePage = (page) => {
+    if (page < 1 || page > lastPage.value || page === currentPage.value) return;
+    fetchProducts(page);
 };
 
 const fetchCategories = async () => {
@@ -303,7 +322,7 @@ onMounted(() => {
                                 <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="font-light text-sm">Quản lý sản phẩm và biến thể (size, giá).</p>
                             </div>
                             <button @click="openAddModal"
-                                class="flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shrink-0">
+                                class="flex items-center px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shrink-0">
                                 <i class="fa-solid fa-plus mr-2 text-lg"></i> Thêm sản phẩm
                             </button>
                         </div>
@@ -333,20 +352,21 @@ onMounted(() => {
                                     </tr>
                                     <tr v-for="(product, index) in products" :key="product.id"
                                         :class="isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50'" class="transition-colors">
-                                        <td class="px-4 py-4 text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ index + 1 }}</td>
+                                        <td class="px-4 py-4 text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ (currentPage - 1) * perPage + index + 1 }}</td>
                                         <td class="px-4 py-4">
-                                            <div class="w-14 h-14 rounded-lg overflow-hidden border" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+                                            <router-link :to="'/product/' + product.slug" class="block w-14 h-14 rounded-lg overflow-hidden border hover:border-pink-500 hover:scale-105 transition-all duration-300" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
                                                 <img v-if="product.thumbnail"
                                                     :src="`http://localhost:8888/images/${product.thumbnail}`"
                                                     class="w-full h-full object-cover" :alt="product.name" />
                                                 <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
-
                                                     <i class="fa-regular fa-image text-gray-400 text-xl"></i>
                                                 </div>
-                                            </div>
+                                            </router-link>
                                         </td>
                                         <td class="px-4 py-4">
-                                            <p class="font-semibold text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">{{ product.name }}</p>
+                                            <router-link :to="'/product/' + product.slug" class="group/name">
+                                                <p class="font-semibold text-sm group-hover/name:text-pink-600 transition-colors" :class="isDark ? 'text-white' : 'text-gray-900'">{{ product.name }}</p>
+                                            </router-link>
                                             <p class="text-xs mt-0.5" :class="isDark ? 'text-gray-500' : 'text-gray-400'">{{ product.images?.length || 0 }} ảnh gallery</p>
                                         </td>
                                         <td class="px-4 py-4 text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
@@ -387,6 +407,41 @@ onMounted(() => {
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div v-if="totalProducts > 0" class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+                            <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                                Hiển thị
+                                <span class="font-semibold">{{ (currentPage - 1) * perPage + 1 }}</span>
+                                -
+                                <span class="font-semibold">{{ Math.min(currentPage * perPage, totalProducts) }}</span>
+                                trong tổng
+                                <span class="font-semibold">{{ totalProducts }}</span>
+                                sản phẩm
+                            </p>
+
+                            <div class="flex items-center gap-2">
+                                <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1"
+                                    class="px-3 py-2 rounded-lg border text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    :class="isDark ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50'">
+                                    Trước
+                                </button>
+
+                                <button v-for="page in lastPage" :key="page" @click="changePage(page)"
+                                    class="w-9 h-9 rounded-lg border text-sm font-semibold transition-colors"
+                                    :class="page === currentPage
+                                        ? 'bg-pink-600 border-pink-600 text-white'
+                                        : isDark ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50'">
+                                    {{ page }}
+                                </button>
+
+                                <button @click="changePage(currentPage + 1)" :disabled="currentPage === lastPage"
+                                    class="px-3 py-2 rounded-lg border text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    :class="isDark ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50'">
+                                    Sau
+                                </button>
+                            </div>
                         </div>
 
                     </div>

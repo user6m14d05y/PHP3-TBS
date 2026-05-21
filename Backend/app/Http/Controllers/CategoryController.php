@@ -9,7 +9,9 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $category = Category::all();
+        $category = Category::select('id', 'name', 'img')
+            ->orderBy('id')
+            ->get();
          return response()->json([
             'status' => 'success',
             'data'   => $category

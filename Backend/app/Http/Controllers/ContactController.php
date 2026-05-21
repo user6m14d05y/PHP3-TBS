@@ -10,12 +10,22 @@ class ContactController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $contacts = Contact::all();
-         return response()->json([
+        $limit = max(1, min($request->integer('limit', 20), 100));
+
+        $contacts = Contact::query()
+            ->select('id', 'email', 'created_at', 'updated_at')
+            ->latest('id')
+            ->paginate($limit);
+
+        return response()->json([
             'status' => 'success',
-            'data'   => $contacts
+            'data' => $contacts->items(),
+            'total' => $contacts->total(),
+            'per_page' => $contacts->perPage(),
+            'current_page' => $contacts->currentPage(),
+            'last_page' => $contacts->lastPage(),
         ]);
     }
     public function SubmitContact(Request $request)

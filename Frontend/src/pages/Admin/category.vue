@@ -81,6 +81,11 @@ const itemForm = ref({ id: null, category_id: null, name: '' });
 const itemMessage = ref('');
 
 const fetchCategoryItems = async (category) => {
+    if (selectedParent.value?.id === category.id) {
+        selectedParent.value = null;
+        categoryItems.value = [];
+        return;
+    }
     selectedParent.value = category;
     try {
         const response = await axios.get(`http://localhost:8888/api/category-item?category_id=${category.id}`);
@@ -183,95 +188,79 @@ const toggleTheme = () => {
                                     </tr>
                                 </thead>
                                 <tbody :class="isDark ? 'divide-gray-700' : 'divide-gray-200'" class="divide-y">
-                                    <tr v-for="(cat, index) in categories" :key="cat.id || index"
-                                        :class="[isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50', selectedParent?.id === cat.id ? (isDark ? 'bg-blue-900/20' : 'bg-blue-50') : '']"
-                                        class="transition-colors group">
-                                        <td class="px-6 py-4 text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ index + 1 }}</td>
-                                        <td class="px-6 py-4">
-                                            <div class="w-14 h-14 rounded-lg overflow-hidden border" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-                                                <img :src="'http://localhost:8888/images/' + cat.img" class="w-full h-full object-cover" :alt="cat.name">
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <!-- Nhấn tên danh mục cha để xem danh mục con -->
-                                            <button @click="fetchCategoryItems(cat)" class="text-sm font-bold hover:underline transition-colors" 
-                                                :class="isDark ? 'text-black-400 hover:text-black-300' : 'text-black-600 hover:text-black-800'">
-                                                {{ cat.name }}
-                                                <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
-                                            </button>
-                                        </td>
-                                        <td class="px-6 py-4 text-right space-x-4 whitespace-nowrap">
-                                            <button @click="editCategory(cat)" class="text-blue-500 hover:text-blue-700 transition-colors">
-                                                <i class="fa-regular fa-pen-to-square text-lg"></i>
-                                            </button>
-                                            <button @click="deleteCategory(cat.id)" class="text-red-500 hover:text-red-700 transition-colors">
-                                                <i class="fa-regular fa-trash-can text-lg"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    <template v-for="(cat, index) in categories" :key="cat.id || index">
+                                        <tr :class="[isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50', selectedParent?.id === cat.id ? (isDark ? 'bg-blue-900/20' : 'bg-blue-50') : '']"
+                                            class="transition-colors group cursor-pointer"
+                                            @click="fetchCategoryItems(cat)">
+                                            <td class="px-6 py-4 text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ index + 1 }}</td>
+                                            <td class="px-6 py-4">
+                                                <div class="w-14 h-14 rounded-lg overflow-hidden border transition-transform duration-300 group-hover:scale-105" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+                                                    <img :src="'http://localhost:8888/images/' + cat.img" class="w-full h-full object-cover" :alt="cat.name">
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-bold transition-colors inline-flex items-center gap-1.5" 
+                                                    :class="[isDark ? 'text-gray-200 group-hover:text-blue-400' : 'text-gray-700 group-hover:text-blue-600', selectedParent?.id === cat.id ? (isDark ? 'text-blue-400' : 'text-blue-600') : '']">
+                                                    {{ cat.name }}
+                                                    <i class="fa-solid fa-chevron-right text-[10px] transition-transform duration-300 group-hover:translate-x-1"
+                                                        :class="selectedParent?.id === cat.id ? 'rotate-90 text-blue-500' : ''"></i>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-right space-x-4 whitespace-nowrap" @click.stop>
+                                                <button @click="editCategory(cat)" class="text-blue-500 hover:text-blue-700 transition-colors">
+                                                    <i class="fa-regular fa-pen-to-square text-lg"></i>
+                                                </button>
+                                                <button @click="deleteCategory(cat.id)" class="text-red-500 hover:text-red-700 transition-colors">
+                                                    <i class="fa-regular fa-trash-can text-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <!-- Hàng danh mục con xổ xuống -->
+                                        <tr :class="isDark ? 'bg-gray-800/10' : 'bg-blue-50/10'">
+                                            <td colspan="4" class="px-8 py-0">
+                                                <div class="grid transition-all duration-300 ease-in-out"
+                                                    :style="{ gridTemplateRows: selectedParent?.id === cat.id ? '1fr' : '0fr' }">
+                                                    <div class="overflow-hidden">
+                                                        <div class="flex flex-col space-y-4 py-6 transition-all duration-300"
+                                                            :class="selectedParent?.id === cat.id ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'">
+                                                    <div class="flex justify-between items-center pb-2 border-b border-dashed" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+                                                        <span class="text-xs font-bold uppercase tracking-wider text-pink-500">
+                                                            Danh mục con của: {{ cat.name }}
+                                                        </span>
+                                                        <button @click.stop="openAddItemModal" class="flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors shadow-sm">
+                                                            <i class="fa-solid fa-plus mr-1"></i> Thêm mục con
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div v-if="categoryItems.length === 0" class="text-xs text-gray-400 italic py-2">
+                                                        Chưa có danh mục con nào. Nhấn "Thêm mục con" để bắt đầu.
+                                                    </div>
+                                                    
+                                                    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-1">
+                                                        <div v-for="item in categoryItems" :key="item.id" 
+                                                            :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-200'"
+                                                            class="flex justify-between items-center p-3 rounded-lg border shadow-sm transition-all hover:border-blue-500/50">
+                                                            <span class="text-sm font-semibold" :class="isDark ? 'text-gray-200' : 'text-gray-800'">
+                                                                {{ item.name }}
+                                                            </span>
+                                                            <div class="flex space-x-2" @click.stop>
+                                                                <button @click="editItem(item)" class="text-blue-500 hover:text-blue-700 transition-colors p-1">
+                                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                                </button>
+                                                                <button @click="deleteItem(item.id)" class="text-red-500 hover:text-red-700 transition-colors p-1">
+                                                                    <i class="fa-regular fa-trash-can"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-
-                    <!-- ===== MODAL QUẢN LÝ DANH MỤC CON ===== -->
-                    <div v-if="selectedParent" class="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                        <div :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-100'"
-                            class="w-full max-w-4xl max-h-[90vh] flex flex-col border shadow-2xl rounded-xl transition-colors duration-300 overflow-hidden relative">
-
-                            <!-- Modal Header -->
-                            <div :class="isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'" class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 border-b gap-4">
-                                <div>
-                                    <h2 :class="isDark ? 'text-white' : 'text-gray-900'" class="text-2xl font-serif font-bold mb-1">
-                                        Danh mục con của: <span class="text-blue-500">{{ selectedParent.name }}</span>
-                                    </h2>
-                                    <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="font-light text-sm">Quản lý các loại hoa/mục thuộc danh mục cha này.</p>
-                                </div>
-                                <div class="flex space-x-3">
-                                    <button @click="openAddItemModal" class="flex items-center px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shrink-0">
-                                        <i class="fa-solid fa-plus mr-2"></i> Thêm mục con
-                                    </button>
-                                    <button @click="selectedParent = null" :class="isDark ? 'bg-gray-700 hover:bg-red-600 text-white' : 'bg-gray-200 hover:bg-red-500 hover:text-white text-gray-700'" class="w-10 h-10 flex items-center justify-center rounded-lg transition-colors">
-                                        <i class="fa-solid fa-xmark text-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Modal Body (Bảng danh sách) -->
-                            <div class="p-6 overflow-y-auto flex-1">
-                                <div v-if="categoryItems.length === 0" class="text-center py-12" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                                    <i class="fa-solid fa-folder-open text-5xl mb-4 block opacity-50"></i>
-                                    <p class="text-base font-medium text-gray-600 dark:text-gray-300">Chưa có danh mục con nào.</p>
-                                    <p class="text-sm mt-1">Nhấn "Thêm mục con" ở trên để bắt đầu tạo.</p>
-                                </div>
-
-                                <div v-else class="overflow-x-auto rounded-lg border" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-                                    <table class="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr :class="isDark ? 'bg-gray-800/50 text-gray-400 border-gray-700' : 'bg-gray-50 text-gray-600 border-gray-200'" class="border-b text-xs uppercase tracking-wider">
-                                                <th class="px-6 py-4 font-semibold w-24">STT</th>
-                                                <th class="px-6 py-4 font-semibold">Tên mặt hàng/Mục con</th>
-                                                <th class="px-6 py-4 font-semibold text-right w-32">Thao tác</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody :class="isDark ? 'divide-gray-700' : 'divide-gray-200'" class="divide-y relative">
-                                            <tr v-for="(item, index) in categoryItems" :key="item.id || index"
-                                                :class="isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-50'" class="transition-colors group">
-                                                <td class="px-6 py-4 text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ index + 1 }}</td>
-                                                <td class="px-6 py-4 text-sm font-bold" :class="isDark ? 'text-gray-200' : 'text-gray-900'">{{ item.name }}</td>
-                                                <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">
-                                                    <button @click="editItem(item)" class="text-blue-500 hover:text-blue-700 transition-colors p-2 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30">
-                                                        <i class="fa-regular fa-pen-to-square text-lg"></i>
-                                                    </button>
-                                                    <button @click="deleteItem(item.id)" class="text-red-500 hover:text-red-700 transition-colors p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/30">
-                                                        <i class="fa-regular fa-trash-can text-lg"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
                     </div>
 

@@ -1,49 +1,57 @@
 <script setup>
 import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
 import Header_client from '@/pages/Includes/Layouts/Header_client.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
 
 // Dummy data for products
-const featuredProducts = ref([
-  {
-    id: 1,
-    name: 'Áo Khoác Blazer Classic',
-    price: '1.250.000 ₫',
-    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-    category: 'Áo Khoác'
-  },
-  {
-    id: 2,
-    name: 'Đầm Lụa Midi Mùa Thu',
-    price: '850.000 ₫',
-    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-    category: 'Váy & Đầm'
-  },
-  {
-    id: 3,
-    name: 'Sơ Mi Cotton Trắng Basic',
-    price: '450.000 ₫',
-    image: 'https://product.hstatic.net/200000525243/product/image-trang-1-ao-so-mi-basic-nam-2406003_1ae823c52e1a45dca41dfefa98683a22_1024x1024.jpg',
-    category: 'Áo Sơ Mi'
-  },
-  {
-    id: 4,
-    name: 'Quần u Thanh Lịch',
-    price: '650.000 ₫',
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-    category: 'Quần'
-  }
-]);
+const featuredProducts = ref([]);
 
-const collections = ref([
-  { name: 'Bộ Sưu Tập Nữ', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { name: 'Bộ Sưu Tập Nam', image: 'https://images.unsplash.com/photo-1490578474895-699bc4e3f39a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  { name: 'Phụ Kiện', image: 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
-]);
+const fetchProducts = () => {
+  axios.get('http://localhost:8888/api/product?limit=4')
+  .then(response => {
+    featuredProducts.value = response.data.data;
+  })
+  .catch(error => {
+    console.error('Error fetching products:', error);
+  });
+}
 
+const formatPrice = (price) => {
+  if (!price) return 'Liên hệ';
+
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  }).format(Number(price));
+};
+
+const getProductPrice = (product) => {
+  const variant = product.variants?.find((item) => item.sale_price) || product.variants?.[0];
+
+  return formatPrice(variant?.sale_price || variant?.price);
+};
+
+const getCategoryName = (product) => {
+  return product.category_item?.name || product.category?.name || 'Sản phẩm';
+};
+
+const isNewProduct = (product) => {
+  if (!product.created_at) return false;
+
+  const createdAt = new Date(product.created_at);
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  return createdAt >= sevenDaysAgo;
+};
+
+onMounted(() => {
+  fetchProducts();
+});
 </script>
 
 <template>
@@ -78,29 +86,35 @@ const collections = ref([
           <h2 class="text-3xl font-serif font-bold text-gray-900 mb-2">Hàng Mới Về</h2>
           <p class="text-gray-500 font-light">Những xu hướng thời trang nổi bật nhất tuần này.</p>
         </div>
-        <a href="#"
+        <RouterLink to="/product"
           class="hidden sm:block text-sm font-medium text-black border-b border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition">
           Xem tất cả
-        </a>
+        </RouterLink>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div v-for="product in featuredProducts" :key="product.id" class="group cursor-pointer">
-          <div class="relative h-96 mb-4 overflow-hidden bg-gray-100">
-            <img :src="product.image" :alt="product.name"
+        <div v-for="product in featuredProducts" :key="product.id" class="group cursor-pointer flex flex-col">
+          <router-link :to="'/product/' + product.slug" class="relative h-96 mb-4 overflow-hidden bg-gray-100 block">
+            <span v-if="isNewProduct(product)"
+              class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
+              New
+            </span>
+            <img :src="'http://localhost:8888/images/' + product.thumbnail" :alt="product.name"
               class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
             <div
-              class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-              <button
+              class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition duration-300 z-20">
+              <button @click.stop.prevent
                 class="bg-white px-6 py-3 text-sm font-medium shadow-lg hover:bg-pink-600 hover:text-white transition w-10/12 uppercase tracking-widest font-bold">
                 Thêm Vào Giỏ
               </button>
             </div>
-          </div>
+          </router-link>
           <div>
-            <span class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">{{ product.category }}</span>
-            <h3 class="text-base font-medium text-gray-900">{{ product.name }}</h3>
-            <p class="mt-1 text-sm text-gray-700 font-semibold">{{ product.price }}</p>
+            <span class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">{{ getCategoryName(product) }}</span>
+            <router-link :to="'/product/' + product.slug">
+              <h3 class="text-base font-medium text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{{ product.name }}</h3>
+            </router-link>
+            <p class="mt-1 text-sm text-pink-600 font-semibold">{{ getProductPrice(product) }}</p>
           </div>
         </div>
       </div>
