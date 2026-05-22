@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryItemController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ChatbotController;
 
 Route::get('/', function () {
     return response()->json([
@@ -22,6 +23,7 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/Login', [AuthController::class, 'login']);
 Route::post('/SubmitContact', [ContactController::class, 'SubmitContact']);
+Route::post('/chatbot', [ChatbotController::class, 'ask']);
 Route::middleware('auth:sanctum')->post('/Logout', [AuthController::class, 'Logout']);
 
 
@@ -56,6 +58,7 @@ Route::delete('/size/{id}', [SizeController::class, 'destroy']);
 
 // Product routes
 Route::get('/product', [ProductController::class, 'index']);
+Route::get('/product/search', [ProductController::class, 'search']);
 Route::get('/product/{slug}', [ProductController::class, 'show']);
 Route::post('/product', [ProductController::class, 'store']);
 Route::post('/product/update/{id}', [ProductController::class, 'update']);

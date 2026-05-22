@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -44,6 +45,62 @@ class ProductController extends Controller
         ]);
     }
 
+    public function search(Request $request)
+    {
+        $validated = $request->validate([
+            'q' => ['required', 'string', 'min:1', 'max:100'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:10'],
+        ]);
+
+        $query = Str::lower(trim($validated['q']));
+        $limit = (int) ($validated['limit'] ?? 6);
+        $cacheKey = 'product_search:' . md5($query) . ':' . $limit;
+
+        $products = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $limit) {
+            return Product::query()
+                ->select('id', 'category_id', 'category_item_id', 'name', 'slug', 'description', 'thumbnail', 'is_active', 'created_at')
+                ->with([
+                    'category:id,name',
+                    'categoryItem:id,category_id,name',
+                    'variants:id,product_id,price,sale_price,is_active',
+                ])
+                ->where('is_active', true)
+                ->where(function ($builder) use ($query) {
+                    $builder->whereRaw('LOWER(name) LIKE ?', ["%{$query}%"])
+                        ->orWhereRaw('LOWER(slug) LIKE ?', ["%{$query}%"])
+                        ->orWhereRaw('LOWER(description) LIKE ?', ["%{$query}%"])
+                        ->orWhereHas('category', function ($categoryQuery) use ($query) {
+                            $categoryQuery->whereRaw('LOWER(name) LIKE ?', ["%{$query}%"]);
+                        })
+                        ->orWhereHas('categoryItem', function ($categoryItemQuery) use ($query) {
+                            $categoryItemQuery->whereRaw('LOWER(name) LIKE ?', ["%{$query}%"]);
+                        });
+                })
+                ->latest('id')
+                ->limit($limit)
+                ->get()
+                ->map(function (Product $product) {
+                    $prices = $product->variants
+                        ->map(fn ($variant) => (float) ($variant->sale_price ?: $variant->price))
+                        ->filter(fn ($price) => $price > 0);
+
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'slug' => $product->slug,
+                        'thumbnail' => $product->thumbnail,
+                        'category_name' => $product->categoryItem?->name ?: $product->category?->name,
+                        'price' => $prices->min(),
+                    ];
+                })
+                ->values();
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $products,
+        ]);
+    }
 
     // GET /api/product/{slug} — Lấy 1 sản phẩm theo slug, hỗ trợ id cho link cũ
     public function show($slug)

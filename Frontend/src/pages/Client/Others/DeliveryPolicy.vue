@@ -21,7 +21,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-4 mb-5">
                         <div class="w-12 h-12 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center">
-                            <span class="material-icons">schedule</span>
+                            <span class="material-symbols-outlined">schedule</span>
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">1. Thời gian giao hàng</h2>
                     </div>
@@ -37,7 +37,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-4 mb-5">
                         <div class="w-12 h-12 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center">
-                            <span class="material-icons">local_shipping</span>
+                            <span class="material-symbols-outlined">local_shipping</span>
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">2. Phí vận chuyển</h2>
                     </div>
@@ -75,7 +75,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-4 mb-5">
                         <div class="w-12 h-12 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center">
-                            <span class="material-icons">ac_unit</span>
+                            <span class="material-symbols-outlined">ac_unit</span>
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">3. Quy trình bảo quản khi vận chuyển</h2>
                     </div>
@@ -88,7 +88,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
 
                 <section class="bg-pink-50 rounded-2xl border border-pink-100 p-6 md:p-8">
                     <div class="flex items-center gap-4 mb-4">
-                        <span class="material-icons text-3xl text-pink-600">verified</span>
+                        <span class="material-symbols-outlined text-3xl text-pink-600">verified</span>
                         <h2 class="text-2xl font-bold text-gray-900">4. Cam kết giao hoa tươi</h2>
                     </div>
                     <p class="text-gray-600 leading-relaxed">

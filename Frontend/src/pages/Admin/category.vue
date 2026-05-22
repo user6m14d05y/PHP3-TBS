@@ -239,7 +239,7 @@ const toggleTheme = () => {
                                                     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-1">
                                                         <div v-for="item in categoryItems" :key="item.id" 
                                                             :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-200'"
-                                                            class="flex justify-between items-center p-3 rounded-lg border shadow-sm transition-all hover:border-blue-500/50">
+                                                            class="flex justify-between items-center p-3 rounded-lg border shadow-sm transition-all hover:border-pink-500/50">
                                                             <span class="text-sm font-semibold" :class="isDark ? 'text-gray-200' : 'text-gray-800'">
                                                                 {{ item.name }}
                                                             </span>

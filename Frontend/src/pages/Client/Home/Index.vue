@@ -7,8 +7,9 @@ import axios from 'axios';
 
 const router = useRouter();
 
-// Dummy data for products
+// Products & Categories data
 const featuredProducts = ref([]);
+const categories = ref([]);
 
 const fetchProducts = () => {
   axios.get('http://localhost:8888/api/product?limit=4')
@@ -17,6 +18,16 @@ const fetchProducts = () => {
   })
   .catch(error => {
     console.error('Error fetching products:', error);
+  });
+}
+
+const fetchCategories = () => {
+  axios.get('http://localhost:8888/api/category')
+  .then(response => {
+    categories.value = response.data.data;
+  })
+  .catch(error => {
+    console.error('Error fetching categories:', error);
   });
 }
 
@@ -49,8 +60,13 @@ const isNewProduct = (product) => {
   return createdAt >= sevenDaysAgo;
 };
 
+const selectCategory = (categoryId) => {
+  router.push({ path: '/product', query: { category: categoryId } });
+};
+
 onMounted(() => {
   fetchProducts();
+  fetchCategories();
 });
 </script>
 
@@ -60,22 +76,66 @@ onMounted(() => {
 
 
     <!-- Hero Banner -->
-    <div class="relative w-full h-[650px] bg-gray-100 flex items-center justify-center overflow-hidden">
-      <img
-        src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-        alt="Hero Banner" class="absolute inset-0 w-full h-full object-cover">
-      <div class="absolute inset-0 bg-black/30"></div>
+    <section class="relative flex h-screen min-h-[560px] w-full items-center justify-center overflow-hidden bg-gray-950 sm:min-h-[640px] lg:min-h-[760px]">
+      <video
+        class="absolute inset-0 h-full w-full object-cover"
+        src="http://localhost:8888/videos/video.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-label="Hero Banner"
+      ></video>
+      <div class="absolute inset-0 bg-black/45 sm:bg-black/40 lg:bg-black/35"></div>
 
-      <div class="relative z-10 text-center text-white px-4 max-w-3xl">
-        <span class="text-sm uppercase tracking-[0.3em] mb-4 block font-medium">Bộ Sưu Tập Mới Nhất</span>
-        <h1 class="text-5xl md:text-7xl font-serif font-bold text-white-900 mb-6 italic leading-tight">Mùa Yêu Thương
-        </h1>
-        <p class="text-lg md:text-xl font-light mb-10 text-gray-100">Khám phá phong cách tối giản mang đậm chất riêng,
-          tôn vinh vẻ đẹp thuần khiết và thanh lịch từ bên trong bạn.</p>
+      <div class="relative z-10 mx-auto w-full max-w-3xl px-5 text-center text-white sm:px-6">
+        <span class="mb-3 block text-[11px] font-semibold uppercase tracking-[0.28em] sm:mb-4 sm:text-sm sm:tracking-[0.3em]">Bộ Sưu Tập Mới Nhất</span>
+        <h1 class="mb-4 font-serif text-4xl font-bold italic leading-tight text-white sm:mb-5 sm:text-6xl lg:text-7xl">Mùa Yêu Thương</h1>
+        <p class="mx-auto mb-7 max-w-xl text-sm font-light leading-relaxed text-gray-100 sm:mb-9 sm:max-w-2xl sm:text-lg lg:text-xl">
+          Khám phá phong cách tối giản mang đậm chất riêng, tôn vinh vẻ đẹp thuần khiết và thanh lịch từ bên trong bạn.
+        </p>
         <router-link replace to="/product"
-          class="cursor-pointer bg-white px-6 py-5 text-sm font-medium text-black shadow-lg hover:bg-pink-600 hover:text-white transition w-10/12 uppercase tracking-widest font-bold">
+          class="inline-flex min-h-11 items-center justify-center bg-white px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-black shadow-lg transition hover:bg-pink-600 hover:text-white sm:min-h-12 sm:px-10 sm:py-4 sm:text-sm">
           MUA SẮM NGAY
         </router-link>
+      </div>
+    </section>
+
+
+    <!-- Category Product -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-b border-pink-50">
+      <div class="text-center mb-12">
+        <span class="text-xs uppercase tracking-[0.3em] text-pink-600 font-medium mb-3 block">Danh Mục Sản Phẩm</span>
+        <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 italic">Khám Phá Các Bộ Sưu Tập Hoa</h2>
+        <div class="w-12 h-0.5 bg-pink-300 mx-auto mt-4"></div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 justify-center">
+        <div 
+          v-for="cat in categories" 
+          :key="cat.id" 
+          @click="selectCategory(cat.id)"
+          class="group cursor-pointer flex flex-col items-center text-center transition-all duration-300"
+        >
+          <!-- Circular (Bo tròn) Image Container -->
+          <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border border-pink-100/50 shadow-md group-hover:shadow-xl group-hover:shadow-pink-100 group-hover:border-pink-300 transition-all duration-500 relative flex items-center justify-center bg-pink-50/20 mb-4">
+            <!-- Smooth Zoom on Hover -->
+            <img 
+              :src="'http://localhost:8888/images/' + cat.img" 
+              :alt="cat.name"
+              class="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-in-out"
+              @error="(e) => e.target.src = 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'"
+            >
+            <!-- Overlay shade -->
+            <div class="absolute inset-0 bg-pink-900/0 group-hover:bg-pink-900/5 transition duration-500 rounded-full"></div>
+          </div>
+          
+          <!-- Category Title -->
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-800 group-hover:text-pink-600 transition-colors duration-300">
+            {{ cat.name }}
+          </h3>
+        </div>
       </div>
     </div>
 

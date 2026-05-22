@@ -13,6 +13,7 @@ const activeImage = ref('');
 const selectedVariant = ref(null);
 const quantity = ref(1);
 const relatedProducts = ref([]);
+const thumbnailScroller = ref(null);
 
 const expandedSections = ref({
   description: true,
@@ -98,6 +99,15 @@ const allImages = computed(() => {
   return [...new Set(imgs)]; // Remove duplicates
 });
 
+const scrollThumbnails = (direction) => {
+  if (!thumbnailScroller.value) return;
+
+  thumbnailScroller.value.scrollBy({
+    left: direction * 260,
+    behavior: 'smooth',
+  });
+};
+
 const getDiscountPercent = (variant) => {
   if (!variant || !variant.sale_price) return 0;
   const disc = ((variant.price - variant.sale_price) / variant.price) * 100;
@@ -109,7 +119,11 @@ const formatVND = (price) => {
 };
 
 const decreaseQty = () => {
-  if (quantity.value > 1) quantity.value--;
+  if (quantity.value > 1) {
+    quantity.value--;
+  } else {
+    console.log('Không thể giảm số lượng')
+  }
 };
 
 const increaseQty = () => {
@@ -117,14 +131,7 @@ const increaseQty = () => {
   if (quantity.value < maxStock) {
     quantity.value++;
   } else {
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'warning',
-      title: 'Đã đạt giới hạn số lượng trong kho!',
-      showConfirmButton: false,
-      timer: 2000
-    });
+    console.log('Không đủ số lượng')
   }
 };
 
@@ -230,12 +237,24 @@ const getMinPrice = (p) => {
           </div>
 
           <!-- Gallery Thumbnails -->
-          <div v-if="allImages.length > 1" class="flex flex-wrap gap-4">
-            <button v-for="(img, idx) in allImages" :key="idx"
-              @click="activeImage = img"
-              class="w-20 h-20 rounded-xl overflow-hidden border-2 bg-gray-50 transition-all duration-200 cursor-pointer"
-              :class="activeImage === img ? 'border-pink-600 scale-95 shadow-md shadow-pink-50' : 'border-gray-200 hover:border-pink-300'">
-              <img :src="'http://localhost:8888/images/' + img" class="w-full h-full object-cover object-center" />
+          <div v-if="allImages.length > 1" class="relative group/thumbs">
+            <button @click="scrollThumbnails(-1)"
+              class="absolute left-0 top-1/2 z-10 -translate-y-1/2 -translate-x-3 w-9 h-9 rounded-full bg-white border border-gray-200 text-gray-600 shadow-lg opacity-0 group-hover/thumbs:opacity-100 hover:text-pink-600 hover:border-pink-300 transition-all duration-300 cursor-pointer">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+
+            <div ref="thumbnailScroller" class="thumbnail-scroll flex gap-4 overflow-x-auto scroll-smooth py-1 px-1">
+              <button v-for="(img, idx) in allImages" :key="idx"
+                @click="activeImage = img"
+                class="shrink-0 w-20 h-20 overflow-hidden border-2 bg-gray-50 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+                :class="activeImage === img ? 'border-pink-600 scale-95 shadow-md shadow-pink-50' : 'border-gray-200 hover:border-pink-300'">
+                <img :src="'http://localhost:8888/images/' + img" class="w-full h-full object-cover object-center" />
+              </button>
+            </div>
+
+            <button @click="scrollThumbnails(1)"
+              class="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-3 w-9 h-9 rounded-full bg-white border border-gray-200 text-gray-600 shadow-lg opacity-0 group-hover/thumbs:opacity-100 hover:text-pink-600 hover:border-pink-300 transition-all duration-300 cursor-pointer">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
           </div>
         </section>
@@ -295,7 +314,7 @@ const getMinPrice = (p) => {
               <button v-for="variant in product.variants" :key="variant.id"
                 @click="selectVariant(variant)"
                 :disabled="variant.stock === 0"
-                class="px-5 py-3 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                class="px-5 py-3 border text-xs font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                 :class="selectedVariant?.id === variant.id
                   ? 'bg-pink-600 border-pink-600 text-white shadow-lg shadow-pink-100 scale-95'
                   : 'border-gray-200 text-gray-700 bg-white hover:border-pink-600 hover:text-pink-600'">
@@ -307,7 +326,7 @@ const getMinPrice = (p) => {
           <!-- Quantity selection and Cart button -->
           <div v-if="selectedVariant && selectedVariant.stock > 0" class="flex flex-col sm:flex-row items-stretch gap-4 pt-4">
             <!-- Counter block -->
-            <div class="flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 shrink-0 sm:w-36 bg-white">
+            <div class="flex items-center justify-between border border-gray-200  px-4 py-3 shrink-0 sm:w-36 bg-white">
               <button @click="decreaseQty" class="text-gray-400 hover:text-pink-600 transition cursor-pointer text-sm py-1 px-2 focus:outline-none">
                 <i class="fa-solid fa-minus"></i>
               </button>
@@ -319,11 +338,11 @@ const getMinPrice = (p) => {
 
             <!-- CTA button -->
             <button @click="handleAddToCart"
-              class="flex-1 bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-xl shadow-pink-100 hover:scale-[1.01] active:scale-95 transition-all duration-200 cursor-pointer text-center">
+              class="flex-1 bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] shadow-xl shadow-pink-100 hover:scale-[1.01] active:scale-95 transition-all duration-200 cursor-pointer text-center">
               Thêm Vào Giỏ Hàng
             </button>
           </div>
-          <div v-else-if="selectedVariant" class="bg-red-50 text-red-600 px-6 py-4 rounded-xl text-sm font-semibold uppercase tracking-wider text-center border border-red-100">
+          <div v-else-if="selectedVariant" class="bg-red-50 text-red-600 px-6 py-4 text-sm font-semibold uppercase tracking-wider text-center border border-red-100">
             Hết hàng tạm thời
           </div>
 
@@ -391,7 +410,7 @@ const getMinPrice = (p) => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div v-for="related in relatedProducts" :key="related.id" class="group cursor-pointer flex flex-col">
-            <router-link :to="'/product/' + related.slug" class="relative h-72 mb-4 overflow-hidden bg-gray-50 border border-gray-100 rounded-xl block">
+            <router-link :to="'/product/' + related.slug" class="relative h-72 mb-4 overflow-hidden bg-gray-50 border border-gray-100 block">
               <img :src="'http://localhost:8888/images/' + related.thumbnail" :alt="related.name"
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
             </router-link>
@@ -431,5 +450,14 @@ const getMinPrice = (p) => {
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.thumbnail-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.thumbnail-scroll::-webkit-scrollbar {
+  display: none;
 }
 </style>

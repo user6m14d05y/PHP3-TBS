@@ -30,8 +30,8 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                                     <div>
                                         <h3 class="text-lg font-bold text-gray-900 mb-1">Địa chỉ</h3>
                                         <p class="text-gray-600 leading-relaxed">
-                                            123 Đường Hoa Hồng, Phường Mùa Xuân,<br />
-                                            Quận 1, TP. Hồ Chí Minh
+                                            123 Đường Phan Chu Trinh, Phường Thắng Lợi,<br />
+                                            TP. Buôn Ma Thuột, Đắk Lắk
                                         </p>
                                     </div>
                                 </div>
@@ -63,11 +63,16 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
                             </div>
                         </section>
 
-                        <div class="rounded-2xl overflow-hidden border border-gray-100 h-[300px] bg-white shadow-sm relative">
-                            <div class="absolute inset-0 flex items-center justify-center flex-col text-gray-400">
-                                <span class="material-symbols-outlined text-5xl mb-2 opacity-60">map</span>
-                                <span class="text-sm font-semibold">Bản đồ vị trí cửa hàng</span>
-                            </div>
+                        <div class="rounded-2xl overflow-hidden border border-gray-100 h-[300px] bg-white shadow-sm">
+                            <iframe 
+                                src="https://maps.google.com/maps?q=123%20Phan%20Chu%20Trinh,%20Th%E1%BA%AFng%20L%E1%BB%A3i,%20Th%C3%A0nh%20ph%E1%BB%91%20Bu%C3%B4n%20Ma%20Thu%E1%BB%99t,%20%C4%90%E1%BA%AFk%20L%E1%BA%AFk,%20Vietnam&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
                         </div>
                     </div>
 

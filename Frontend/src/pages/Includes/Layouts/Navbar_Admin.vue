@@ -51,9 +51,9 @@ const getLinkClass = (path, exact = false) => {
     >
         <!-- Logo Header -->
         <div :class="isDark ? 'border-gray-700' : 'border-gray-200'" class="flex items-center justify-center h-16 border-b shrink-0 transition-all duration-300">
-            <h1 :class="isDark ? 'text-white' : 'text-black'" class="text-2xl font-serif font-bold tracking-wider transition-opacity duration-300">
+            <router-link replace to="/admin" class="text-2xl font-serif font-bold tracking-wider transition-opacity duration-300">
                 <img src="../../../../public/favicon.ico" alt="Logo" class="w-15 h-15">   
-            </h1>
+            </router-link>
         </div>
 
         <nav class="flex-1 px-3 py-4 space-y-2 overflow-y-auto overflow-x-hidden custom-scrollbar">

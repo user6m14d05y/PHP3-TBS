@@ -3,8 +3,10 @@ import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
 import Header_client from '@/pages/Includes/Layouts/Header_client.vue';
 import SlidebarProduct_client from '@/pages/Includes/Layouts/SlidebarProduct_client.vue';
 import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 
+const route = useRoute();
 const products = ref([]);
 const categories = ref([]);
 const categoryItems = ref([]);
@@ -44,8 +46,12 @@ const fetchProducts = async () => {
   }
 };
 
-onMounted(() => {
-  fetchCategories();
+onMounted(async () => {
+  await fetchCategories();
+  if (route.query.category) {
+    selectedCategoryId.value = Number(route.query.category);
+    openedCategoryId.value = Number(route.query.category);
+  }
   fetchCategoryItems();
   fetchProducts();
 });

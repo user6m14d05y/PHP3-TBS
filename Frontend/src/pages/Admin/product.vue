@@ -21,6 +21,7 @@ const lastPage = ref(1);
 const isModalOpen = ref(false);
 const isEditMode  = ref(false);
 const editingId   = ref(null);
+const maxUploadSize = 60 * 1024 * 1024;
 
 // Form sản phẩm
 const form = ref({
@@ -142,15 +143,48 @@ const openEditModal = async (product) => {
 const closeModal = () => { isModalOpen.value = false; };
 
 // ========== UPLOAD ẢNH ==========
+const getPendingUploadSize = (files = []) => {
+    const thumbnailSize = form.value.thumbnail?.size || 0;
+    const gallerySize = form.value.gallery.reduce((total, file) => total + file.size, 0);
+    const newFilesSize = files.reduce((total, file) => total + file.size, 0);
+
+    return thumbnailSize + gallerySize + newFilesSize;
+};
+
 const handleThumbnail = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const currentThumbnailSize = form.value.thumbnail?.size || 0;
+    if (getPendingUploadSize([file]) - currentThumbnailSize > maxUploadSize) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Ảnh quá lớn',
+            text: 'Tổng dung lượng ảnh upload tối đa là 60MB. Vui lòng giảm số lượng hoặc nén ảnh.',
+            confirmButtonColor: '#3b82f6',
+        });
+        e.target.value = '';
+        return;
+    }
+
     form.value.thumbnail = file;
     form.value.thumbnailPreview = URL.createObjectURL(file);
 };
 
 const handleGallery = (e) => {
     const files = Array.from(e.target.files);
+
+    if (getPendingUploadSize(files) > maxUploadSize) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Ảnh quá lớn',
+            text: 'Tổng dung lượng ảnh upload tối đa là 60MB. Vui lòng giảm số lượng hoặc nén ảnh.',
+            confirmButtonColor: '#3b82f6',
+        });
+        e.target.value = '';
+        return;
+    }
+
     files.forEach(file => {
         form.value.gallery.push(file);
         form.value.galleryPreviews.push(URL.createObjectURL(file));
@@ -247,7 +281,12 @@ const saveProduct = async () => {
         });
     } catch (e) {
         console.error('Lỗi khi lưu sản phẩm:', e);
-        Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, kiểm tra lại dữ liệu!', confirmButtonColor: '#3b82f6' });
+
+        const message = e.response?.status === 413
+            ? 'Dung lượng ảnh upload quá lớn. Vui lòng giảm số lượng hoặc nén ảnh trước khi lưu.'
+            : e.response?.data?.message || 'Có lỗi xảy ra, kiểm tra lại dữ liệu!';
+
+        Swal.fire({ icon: 'error', title: 'Lỗi!', text: message, confirmButtonColor: '#3b82f6' });
     }
 };
 
