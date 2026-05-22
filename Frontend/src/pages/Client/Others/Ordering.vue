@@ -1,6 +1,14 @@
 <script setup>
-import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
-import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
+import Header_Client from '@/pages/Includes/Layouts/Header_client.vue';
+import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
+import { setPageSeo } from '@/utils/seo';
+
+setPageSeo({
+    title: 'Hướng dẫn đặt hoa | TBS Flower Shop',
+    description: 'Hướng dẫn chọn mẫu hoa, thêm vào giỏ, nhập thông tin giao hàng và thanh toán khi đặt hoa tươi tại TBS Flower Shop.',
+    path: '/ordering',
+    image: '/favicon.ico',
+});
 </script>
 
 <template>

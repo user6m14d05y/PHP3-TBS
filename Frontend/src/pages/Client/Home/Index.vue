@@ -4,6 +4,8 @@ import Header_client from '@/pages/Includes/Layouts/Header_client.vue';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { setPageSeo } from '@/utils/seo';
+import { apiUrl, imageUrl, videoUrl } from '@/utils/api';
 
 const router = useRouter();
 
@@ -12,7 +14,7 @@ const featuredProducts = ref([]);
 const categories = ref([]);
 
 const fetchProducts = () => {
-  axios.get('http://localhost:8888/api/product?limit=4')
+  axios.get(apiUrl('/api/product?limit=4'))
   .then(response => {
     featuredProducts.value = response.data.data;
   })
@@ -22,7 +24,7 @@ const fetchProducts = () => {
 }
 
 const fetchCategories = () => {
-  axios.get('http://localhost:8888/api/category')
+  axios.get(apiUrl('/api/category'))
   .then(response => {
     categories.value = response.data.data;
   })
@@ -46,8 +48,25 @@ const getProductPrice = (product) => {
   return formatPrice(variant?.sale_price || variant?.price);
 };
 
+const getBestVariant = (product) => {
+  if (!product.variants?.length) return null;
+
+  return [...product.variants]
+    .filter((variant) => Number(variant.price) > 0)
+    .sort((a, b) => Number(a.sale_price || a.price) - Number(b.sale_price || b.price))[0] || null;
+};
+
+const getDiscountPercent = (variant) => {
+  const price = Number(variant?.price);
+  const salePrice = Number(variant?.sale_price);
+
+  if (!price || !salePrice || salePrice >= price) return 0;
+
+  return Math.round(((price - salePrice) / price) * 100);
+};
+
 const getCategoryName = (product) => {
-  return product.category_item?.name || product.category?.name || 'Sản phẩm';
+  return product.categoryItem?.name || product.category_item?.name || product.category?.name || 'Sản phẩm';
 };
 
 const isNewProduct = (product) => {
@@ -64,6 +83,13 @@ const selectCategory = (categoryId) => {
   router.push({ path: '/product', query: { category: categoryId } });
 };
 
+setPageSeo({
+  title: 'TBS Flower Shop | Hoa tươi thiết kế, giao nhanh trong ngày',
+  description: 'TBS Flower Shop cung cấp hoa tươi thiết kế theo dịp, giao nhanh trong ngày, tối ưu cho quà tặng, khai trương và sự kiện.',
+  path: '/',
+  image: '/favicon.ico',
+});
+
 onMounted(() => {
   fetchProducts();
   fetchCategories();
@@ -79,7 +105,7 @@ onMounted(() => {
     <section class="relative flex h-screen min-h-[560px] w-full items-center justify-center overflow-hidden bg-gray-950 sm:min-h-[640px] lg:min-h-[760px]">
       <video
         class="absolute inset-0 h-full w-full object-cover"
-        src="http://localhost:8888/videos/video.mp4"
+        :src="videoUrl('video.mp4')"
         autoplay
         muted
         loop
@@ -93,7 +119,7 @@ onMounted(() => {
         <span class="mb-3 block text-[11px] font-semibold uppercase tracking-[0.28em] sm:mb-4 sm:text-sm sm:tracking-[0.3em]">Bộ Sưu Tập Mới Nhất</span>
         <h1 class="mb-4 font-serif text-4xl font-bold italic leading-tight text-white sm:mb-5 sm:text-6xl lg:text-7xl">Mùa Yêu Thương</h1>
         <p class="mx-auto mb-7 max-w-xl text-sm font-light leading-relaxed text-gray-100 sm:mb-9 sm:max-w-2xl sm:text-lg lg:text-xl">
-          Khám phá phong cách tối giản mang đậm chất riêng, tôn vinh vẻ đẹp thuần khiết và thanh lịch từ bên trong bạn.
+          Khám phá những thiết kế hoa tươi tinh tế, được tuyển chọn theo mùa và gửi gắm trọn vẹn cảm xúc trong từng bó hoa.
         </p>
         <router-link replace to="/product"
           class="inline-flex min-h-11 items-center justify-center bg-white px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-black shadow-lg transition hover:bg-pink-600 hover:text-white sm:min-h-12 sm:px-10 sm:py-4 sm:text-sm">
@@ -122,7 +148,7 @@ onMounted(() => {
           <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border border-pink-100/50 shadow-md group-hover:shadow-xl group-hover:shadow-pink-100 group-hover:border-pink-300 transition-all duration-500 relative flex items-center justify-center bg-pink-50/20 mb-4">
             <!-- Smooth Zoom on Hover -->
             <img 
-              :src="'http://localhost:8888/images/' + cat.img" 
+              :src="imageUrl(cat.img)" 
               :alt="cat.name"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-in-out"
               @error="(e) => e.target.src = 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'"
@@ -144,7 +170,7 @@ onMounted(() => {
       <div class="flex justify-between items-end mb-10">
         <div>
           <h2 class="text-3xl font-serif font-bold text-gray-900 mb-2">Hàng Mới Về</h2>
-          <p class="text-gray-500 font-light">Những xu hướng thời trang nổi bật nhất tuần này.</p>
+          <p class="text-gray-500 font-light">Những mẫu hoa tươi được yêu thích nhất trong tuần này.</p>
         </div>
         <RouterLink to="/product"
           class="hidden sm:block text-sm font-medium text-black border-b border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition">
@@ -159,8 +185,14 @@ onMounted(() => {
               class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
               New
             </span>
-            <img :src="'http://localhost:8888/images/' + product.thumbnail" :alt="product.name"
-              class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
+            <span v-if="getDiscountPercent(getBestVariant(product))"
+              class="absolute left-4 top-4 z-10 rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+              -{{ getDiscountPercent(getBestVariant(product)) }}%
+            </span>
+            <img :src="imageUrl(product.thumbnail)" :alt="product.image_alt || product.name"
+              class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out"
+              loading="lazy"
+              decoding="async">
             <div
               class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition duration-300 z-20">
               <button @click.stop.prevent
@@ -174,7 +206,12 @@ onMounted(() => {
             <router-link :to="'/product/' + product.slug">
               <h3 class="text-base font-medium text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{{ product.name }}</h3>
             </router-link>
-            <p class="mt-1 text-sm text-pink-600 font-semibold">{{ getProductPrice(product) }}</p>
+            <div class="mt-1 flex flex-wrap items-center gap-2">
+              <p class="text-sm text-pink-600 font-semibold">{{ getProductPrice(product) }}</p>
+              <span v-if="getDiscountPercent(getBestVariant(product))" class="text-xs font-semibold text-emerald-600">
+                Giảm {{ getDiscountPercent(getBestVariant(product)) }}%
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -184,11 +221,11 @@ onMounted(() => {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-[1400px] mx-auto px-2 mb-20">
       <div class="relative h-[500px] overflow-hidden group">
         <img
-          src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-          alt="Style Edit" class="w-full h-full object-cover transition duration-1000 group-hover:scale-105">
+          src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+          alt="Bộ sưu tập hoa tươi theo mùa" class="w-full h-full object-cover transition duration-1000 group-hover:scale-105">
         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-500"></div>
         <div class="absolute inset-0 flex flex-col justify-center items-center text-white text-center p-6">
-          <h3 class="text-3xl font-serif font-bold mb-4">The Style Edit</h3>
+          <h3 class="text-3xl font-serif font-bold mb-4">Hoa Theo Mùa</h3>
           <button
             class="border border-white px-8 py-3 text-sm font-medium hover:bg-white hover:text-black transition duration-300">Khám
             Phá</button>
@@ -197,9 +234,8 @@ onMounted(() => {
       <div
         class="relative h-[500px] overflow-hidden group bg-gray-100 flex flex-col justify-center items-center text-center p-12">
         <span class="text-gray-400 text-sm uppercase tracking-[0.2em] mb-4">Cam Kết Chất Lượng</span>
-        <h3 class="text-3xl font-serif font-bold text-gray-900 mb-6">Chất Liệu Bền Vững</h3>
-        <p class="text-gray-600 font-light mb-8 max-w-md leading-relaxed">Chúng tôi sử dụng sợi tái chế và vải hữu cơ
-          thiên nhiên, góp phần bảo vệ môi trường mà vẫn giữ được sự tinh tế, sang trọng cho người mặc.</p>
+        <h3 class="text-3xl font-serif font-bold text-gray-900 mb-6">Hoa Tươi Mỗi Ngày</h3>
+        <p class="text-gray-600 font-light mb-8 max-w-md leading-relaxed">Chúng tôi tuyển chọn hoa tươi theo ngày, thiết kế chỉn chu và chụp ảnh xác nhận trước khi giao để mỗi món quà luôn giữ được sự tinh tế.</p>
         <button
           class="text-sm font-medium text-black border-b border-black pb-1 hover:text-gray-500 hover:border-gray-500 transition">Tìm
           Hiểu Thêm</button>

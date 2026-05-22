@@ -2,8 +2,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../../stores/auth';
-import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
-import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
+import Header_Client from '@/pages/Includes/Layouts/Header_client.vue';
+import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
 
 </script>
 <template>

@@ -6,6 +6,8 @@ services:
     image: node:20-alpine
     container_name: frontend-tbs
     working_dir: /app
+    env_file:
+      - ./backend/.env
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules  # Cache node_modules riêng, không reinstall mỗi lần

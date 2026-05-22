@@ -1,6 +1,14 @@
 <script setup>
-import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
-import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
+import Header_Client from '@/pages/Includes/Layouts/Header_client.vue';
+import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
+import { setPageSeo } from '@/utils/seo';
+
+setPageSeo({
+    title: 'Flower delivery policy | TBS Flower Shop',
+    description: 'Delivery timing, shipping fees, and fresh flower handling commitments from TBS Flower Shop.',
+    path: '/delivery-policy',
+    image: '/favicon.ico',
+});
 </script>
 
 <template>

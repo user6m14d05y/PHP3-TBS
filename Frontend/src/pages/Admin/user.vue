@@ -3,6 +3,7 @@ import header_admin from '../Includes/Layouts/Header_Admin.vue';
 import navbar_admin from '../Includes/Layouts/Navbar_Admin.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { apiUrl } from '@/utils/api';
 
 const isDark = ref(false);
 const isSidebarOpen = ref(true);
@@ -10,7 +11,7 @@ const users = ref([]);
 
 const fetchUsers = async () => {
     try {
-        const response = await axios.get('http://localhost:8888/api/user');
+        const response = await axios.get(apiUrl('/api/user'));
         users.value = response.data.data; 
     } catch (error) {
         console.error('Error fetching users:', error);

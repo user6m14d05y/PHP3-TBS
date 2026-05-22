@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { apiUrl } from '@/utils/api';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -15,7 +16,7 @@ export const useAuthStore = defineStore('auth', {
         return null;
       }
       try {
-        const res = await axios.get('http://localhost:8888/api/me', {
+        const res = await axios.get(apiUrl('/api/me'), {
             headers: { Authorization: `Bearer ${token}` }
         });
         this.user = res.data;

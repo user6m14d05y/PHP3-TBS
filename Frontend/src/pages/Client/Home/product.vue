@@ -5,6 +5,8 @@ import SlidebarProduct_client from '@/pages/Includes/Layouts/SlidebarProduct_cli
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { setPageSeo } from '@/utils/seo';
+import { apiUrl, imageUrl } from '@/utils/api';
 
 const route = useRoute();
 const products = ref([]);
@@ -18,10 +20,14 @@ const sortOption = ref('default');
 
 const currentPage = ref(1);
 const perPage = ref(12);
+const defaultProductListSeo = {
+  title: 'Fresh flower shop | TBS Flower Shop',
+  description: 'Explore fresh flower collections by category, price range, and gifting occasion.',
+};
 
 const fetchCategories = async () => {
   try {
-    const response = await axios.get('http://localhost:8888/api/category');
+    const response = await axios.get(apiUrl('/api/category'));
     categories.value = response.data.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -30,7 +36,7 @@ const fetchCategories = async () => {
 
 const fetchCategoryItems = async () => {
   try {
-    const response = await axios.get('http://localhost:8888/api/category-item');
+    const response = await axios.get(apiUrl('/api/category-item'));
     categoryItems.value = response.data.data;
   } catch (error) {
     console.error('Error fetching category items:', error);
@@ -39,22 +45,12 @@ const fetchCategoryItems = async () => {
 
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('http://localhost:8888/api/product?limit=100');
+    const response = await axios.get(apiUrl('/api/product?limit=100'));
     products.value = response.data.data;
   } catch (error) {
     console.error('Error fetching products:', error);
   }
 };
-
-onMounted(async () => {
-  await fetchCategories();
-  if (route.query.category) {
-    selectedCategoryId.value = Number(route.query.category);
-    openedCategoryId.value = Number(route.query.category);
-  }
-  fetchCategoryItems();
-  fetchProducts();
-});
 
 // Danh sách Mức giá
 const priceRanges = ref([
@@ -98,6 +94,37 @@ const lastPage = computed(() => {
   return Math.ceil(filteredProducts.value.length / perPage.value) || 1;
 });
 
+const selectedSeoSource = computed(() => {
+  if (selectedCategoryItemId.value) {
+    return categoryItems.value.find((item) => Number(item.id) === Number(selectedCategoryItemId.value)) || null;
+  }
+
+  if (selectedCategoryId.value) {
+    return categories.value.find((category) => Number(category.id) === Number(selectedCategoryId.value)) || null;
+  }
+
+  return null;
+});
+
+const selectedSeoTitle = computed(() => {
+  return selectedSeoSource.value?.seo_title || selectedSeoSource.value?.name || '';
+});
+
+const selectedSeoContent = computed(() => {
+  return selectedSeoSource.value?.seo_content || '';
+});
+
+const updateProductListSeo = () => {
+  const source = selectedSeoSource.value;
+
+  setPageSeo({
+    title: source?.seo_title || (source?.name ? `${source.name} | TBS Flower Shop` : defaultProductListSeo.title),
+    description: source?.meta_description || source?.seo_content || defaultProductListSeo.description,
+    path: '/product',
+    image: '/favicon.ico',
+  });
+};
+
 const changePage = (page) => {
   if (page < 1 || page > lastPage.value || page === currentPage.value) return;
   currentPage.value = page;
@@ -106,6 +133,10 @@ const changePage = (page) => {
 
 watch([selectedCategoryId, selectedCategoryItemId, selectedPriceRanges, sortOption], () => {
   currentPage.value = 1;
+}, { deep: true });
+
+watch([selectedCategoryId, selectedCategoryItemId, categories, categoryItems], () => {
+  updateProductListSeo();
 }, { deep: true });
 
 const getMinPrice = (price) => {
@@ -120,12 +151,29 @@ const getMaxPrice = (price) => {
   return Math.max(...prices);
 }
 
+const getBestVariant = (product) => {
+  if (!product.variants?.length) return null;
+
+  return [...product.variants]
+    .filter((variant) => Number(variant.price) > 0)
+    .sort((a, b) => Number(a.sale_price || a.price) - Number(b.sale_price || b.price))[0] || null;
+};
+
+const getDiscountPercent = (variant) => {
+  const price = Number(variant?.price);
+  const salePrice = Number(variant?.sale_price);
+
+  if (!price || !salePrice || salePrice >= price) return 0;
+
+  return Math.round(((price - salePrice) / price) * 100);
+};
+
 const formatVND = (price) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 }
 
 const getCategoryName = (product) => {
-  return product.category_item?.name || product.category?.name || 'Chưa phân loại';
+  return product.categoryItem?.name || product.category_item?.name || product.category?.name || 'Chưa phân loại';
 }
 
 const isNewProduct = (product) => {
@@ -161,6 +209,19 @@ const clearFilters = () => {
   sortOption.value = 'default';
 };
 
+updateProductListSeo();
+
+onMounted(async () => {
+  await fetchCategories();
+  if (route.query.category) {
+    selectedCategoryId.value = Number(route.query.category);
+    openedCategoryId.value = Number(route.query.category);
+  }
+  await fetchCategoryItems();
+  await fetchProducts();
+  updateProductListSeo();
+});
+
 </script>
 
 <template>
@@ -173,10 +234,16 @@ const clearFilters = () => {
         <span class="text-xs uppercase tracking-[0.4em] mb-4 block font-medium text-pink-600">Tuyển tập hoa mới
           nhất</span>
         <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-6 italic leading-tight">Cửa hàng hoa</h1>
-        <p class="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">Khám phá phong cách tối
-          giản mang đậm chất riêng, tôn vinh vẻ đẹp thuần khiết và thanh lịch từ thiên nhiên.</p>
+        <p class="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">Khám phá các mẫu hoa tươi theo dịp, được thiết kế tinh tế từ nguyên liệu chọn lọc mỗi ngày.</p>
       </div>
     </div>
+
+    <section v-if="selectedSeoContent" class="border-b border-pink-50 bg-white py-10">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <h2 class="mb-3 font-serif text-2xl font-bold text-gray-900">{{ selectedSeoTitle }}</h2>
+        <p class="whitespace-pre-line text-sm leading-7 text-gray-600">{{ selectedSeoContent }}</p>
+      </div>
+    </section>
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full flex flex-col md:flex-row gap-16">
 
@@ -288,8 +355,14 @@ const clearFilters = () => {
                     class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
                     New
                   </span>
-                  <img :src="'http://localhost:8888/images/' + product.thumbnail" :alt="product.name"
-                    class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
+                  <span v-if="getDiscountPercent(getBestVariant(product))"
+                    class="absolute left-4 top-4 z-10 rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+                    -{{ getDiscountPercent(getBestVariant(product)) }}%
+                  </span>
+                  <img :src="imageUrl(product.thumbnail)" :alt="product.image_alt || product.name"
+                    class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out"
+                    loading="lazy"
+                    decoding="async">
                   <div
                     class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition duration-300 z-20">
                     <button @click.stop.prevent
@@ -303,7 +376,12 @@ const clearFilters = () => {
                   <router-link :to="'/product/' + product.slug">
                     <h3 class="text-base font-medium text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{{ product.name }}</h3>
                   </router-link>
-                  <p class="text-sm font-bold text-gray-900 mt-1">{{ formatVND(getMinPrice(product)) }}</p>  
+                  <div class="mt-1 flex flex-wrap items-center gap-2">
+                    <p class="text-sm font-bold text-gray-900">{{ formatVND(getMinPrice(product)) }}</p>
+                    <span v-if="getDiscountPercent(getBestVariant(product))" class="text-xs font-semibold text-emerald-600">
+                      Giảm {{ getDiscountPercent(getBestVariant(product)) }}%
+                    </span>
+                  </div>
                 </div>
               </div>
           </div>

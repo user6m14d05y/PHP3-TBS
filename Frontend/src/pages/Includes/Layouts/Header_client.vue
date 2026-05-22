@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuthStore } from '../../../stores/auth';
+import { apiUrl, imageUrl } from '@/utils/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -59,7 +60,7 @@ const fetchSearchResults = () => {
     isSearching.value = true;
     searchTimer = setTimeout(async () => {
         try {
-            const response = await axios.get('http://localhost:8888/api/product/search', {
+            const response = await axios.get(apiUrl('/api/product/search'), {
                 params: { q: query, limit: 6 },
             });
             searchResults.value = response.data.data || [];
@@ -90,7 +91,7 @@ const handleScroll = () => {
 const logout = async () => {
     try {
         const token = localStorage.getItem('access_token');
-        await axios.post('http://localhost:8888/api/Logout', {}, {
+        await axios.post(apiUrl('/api/Logout'), {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
     } catch (error) {
@@ -127,6 +128,15 @@ onBeforeUnmount(() => {
                     </router-link>
                     <nav class="hidden md:flex space-x-8">
                         <router-link replace to="/product" class="text-sm font-medium transition" :class="hasLightHeader ? 'text-gray-500 hover:text-pink-600' : 'text-white/90 hover:text-white'">Cửa hàng</router-link>
+                    </nav>
+                    <nav class="hidden md:flex space-x-8">
+                        <router-link replace to="/" class="text-sm font-medium transition" :class="hasLightHeader ? 'text-gray-500 hover:text-pink-600' : 'text-white/90 hover:text-white'">Về chúng tôi</router-link>
+                    </nav>
+                    <nav class="hidden md:flex space-x-8">
+                        <router-link replace to="/" class="text-sm font-medium transition" :class="hasLightHeader ? 'text-gray-500 hover:text-pink-600' : 'text-white/90 hover:text-white'">Dịch vụ</router-link>
+                    </nav>
+                    <nav class="hidden md:flex space-x-8">
+                        <router-link replace to="/" class="text-sm font-medium transition" :class="hasLightHeader ? 'text-gray-500 hover:text-pink-600' : 'text-white/90 hover:text-white'">Liên hệ</router-link>
                     </nav>
                 </div>
 
@@ -214,7 +224,7 @@ onBeforeUnmount(() => {
                             class="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-pink-50 transition-all duration-200 text-left group"
                         >
                             <img
-                                :src="'http://localhost:8888/images/' + product.thumbnail"
+                                :src="imageUrl(product.thumbnail)"
                                 :alt="product.name"
                                 class="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100"
                             />

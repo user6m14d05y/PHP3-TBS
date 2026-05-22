@@ -11,6 +11,10 @@ class CategoryItem extends Model
     protected $fillable = [
         'category_id',
         'name',
+        'slug',
+        'seo_title',
+        'meta_description',
+        'seo_content',
     ];
 
     /**

@@ -3,6 +3,7 @@ import header_admin from '../Includes/Layouts/Header_Admin.vue';
 import navbar_admin from '../Includes/Layouts/Navbar_Admin.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { apiUrl } from '@/utils/api';
 
 const isDark = ref(false);
 const isSidebarOpen = ref(true);
@@ -18,7 +19,7 @@ const isDetailOpen = ref(false);
 const fetchContacts = async (page = currentPage.value) => {
     loading.value = true;
     try {
-        const response = await axios.get('http://localhost:8888/api/contact', {
+        const response = await axios.get(apiUrl('/api/contact'), {
             params: {
                 page,
                 limit: perPage.value,

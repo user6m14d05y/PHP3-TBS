@@ -18,7 +18,11 @@ class Product extends Model
         'name',
         'slug',
         'description',
+        'seo_title',
+        'meta_description',
+        'focus_keyword',
         'thumbnail',
+        'image_alt',
         'is_active',
     ];
 

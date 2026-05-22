@@ -1,6 +1,14 @@
 <script setup>
-import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
-import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
+import Header_Client from '@/pages/Includes/Layouts/Header_client.vue';
+import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
+import { setPageSeo } from '@/utils/seo';
+
+setPageSeo({
+    title: 'Chính sách & điều khoản | TBS Flower Shop',
+    description: 'Thông tin chính sách bảo mật, điều khoản dịch vụ và trách nhiệm khi mua hoa tươi tại TBS Flower Shop.',
+    path: '/terms',
+    image: '/favicon.ico',
+});
 </script>
 <template>
     <Header_Client />

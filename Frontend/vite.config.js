@@ -12,6 +12,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  envDir: fileURLToPath(new URL('../backend', import.meta.url)),
   server: {
     watch: {
       usePolling: true,

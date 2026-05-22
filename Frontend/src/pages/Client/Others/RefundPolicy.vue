@@ -1,6 +1,14 @@
 <script setup>
-import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
-import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
+import Header_Client from '@/pages/Includes/Layouts/Header_client.vue';
+import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
+import { setPageSeo } from '@/utils/seo';
+
+setPageSeo({
+    title: 'Đổi trả & hoàn tiền | TBS Flower Shop',
+    description: 'Chính sách đổi trả và hoàn tiền của TBS Flower Shop cho đơn hoa tươi bị giao sai mẫu, hư hỏng hoặc phát sinh sự cố khi vận chuyển.',
+    path: '/refund-policy',
+    image: '/favicon.ico',
+});
 </script>
 
 <template>
