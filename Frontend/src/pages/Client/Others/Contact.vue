@@ -1,6 +1,14 @@
 <script setup>
-import Header_Client from '@/pages/Includes/Layouts/Header_Client.vue';
-import Footer_Client from '@/pages/Includes/Layouts/Footer_Client.vue';
+import Header_Client from '@/pages/Includes/Layouts/Header_client.vue';
+import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
+import { setPageSeo } from '@/utils/seo';
+
+setPageSeo({
+    title: 'Contact TBS Flower Shop | Fresh flower consultation',
+    description: 'Contact TBS Flower Shop for flower recommendations, occasion orders, and delivery support.',
+    path: '/contact',
+    image: '/favicon.ico',
+});
 </script>
 
 <template>

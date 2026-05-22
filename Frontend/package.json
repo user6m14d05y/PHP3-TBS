@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "seo:generate": "node scripts/generate-seo-files.mjs",
     "build": "vite build",
+    "build:seo": "npm run seo:generate && vite build && node scripts/prerender-product-pages.mjs",
     "preview": "vite preview",
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",

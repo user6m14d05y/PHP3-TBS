@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { apiUrl } from '@/utils/api';
 
 const name = ref('');
 const email = ref('');
@@ -39,7 +40,7 @@ const handleRegister = async () => {
     isSubmitting.value = true;
     
     try {
-        const response = await axios.post('http://localhost:8888/api/register', {
+        const response = await axios.post(apiUrl('/api/register'), {
             name: name.value,
             email: email.value,
             password: password.value,

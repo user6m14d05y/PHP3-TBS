@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuthStore } from '../../../stores/auth';
+import { apiUrl } from '@/utils/api';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -20,7 +21,7 @@ const emit = defineEmits(['toggle-sidebar', 'toggle-theme']);
 const logout = async () => {
     try {
         const token = localStorage.getItem('access_token');
-        await axios.post('http://localhost:8888/api/Logout', {}, {
+        await axios.post(apiUrl('/api/Logout'), {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
     } catch (error) {

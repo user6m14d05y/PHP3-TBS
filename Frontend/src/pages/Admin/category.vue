@@ -4,6 +4,7 @@ import navbar_admin from '../Includes/Layouts/Navbar_Admin.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { apiUrl, imageUrl } from '@/utils/api';
 
 const isDark = ref(false);
 const isSidebarOpen = ref(true);
@@ -11,12 +12,20 @@ const isSidebarOpen = ref(true);
 // ========== DANH MỤC CHA ==========
 const categories = ref([]);
 const isModalOpen = ref(false);
-const categoryForm = ref({ id: null, name: '', image: null });
+const categoryForm = ref({
+    id: null,
+    name: '',
+    slug: '',
+    seo_title: '',
+    meta_description: '',
+    seo_content: '',
+    image: null,
+});
 const message = ref('');
 
 const fetchCategories = async () => {
     try {
-        const response = await axios.get('http://localhost:8888/api/category');
+        const response = await axios.get(apiUrl('/api/category'));
         categories.value = response.data.data;
         if (message.value) {
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: message.value, showConfirmButton: false, timer: 3000, timerProgressBar: true });
@@ -28,13 +37,21 @@ const fetchCategories = async () => {
 };
 
 const openAddModal = () => {
-    categoryForm.value = { id: null, name: '', image: null };
+    categoryForm.value = { id: null, name: '', slug: '', seo_title: '', meta_description: '', seo_content: '', image: null };
     isModalOpen.value = true;
     message.value = 'Thêm danh mục thành công!';
 };
 
 const editCategory = (cat) => {
-    categoryForm.value = { id: cat.id, name: cat.name, image: null };
+    categoryForm.value = {
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug || '',
+        seo_title: cat.seo_title || '',
+        meta_description: cat.meta_description || '',
+        seo_content: cat.seo_content || '',
+        image: null,
+    };
     isModalOpen.value = true;
     message.value = 'Sửa danh mục thành công!';
 };
@@ -43,12 +60,16 @@ const saveCategory = async () => {
     try {
         const formData = new FormData();
         formData.append('name', categoryForm.value.name);
+        formData.append('slug', categoryForm.value.slug || '');
+        formData.append('seo_title', categoryForm.value.seo_title || '');
+        formData.append('meta_description', categoryForm.value.meta_description || '');
+        formData.append('seo_content', categoryForm.value.seo_content || '');
         if (categoryForm.value.image) formData.append('image', categoryForm.value.image);
 
         if (categoryForm.value.id) {
-            await axios.post(`http://localhost:8888/api/category/update/${categoryForm.value.id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await axios.post(apiUrl(`/api/category/update/${categoryForm.value.id}`), formData, { headers: { 'Content-Type': 'multipart/form-data' } });
         } else {
-            await axios.post('http://localhost:8888/api/category', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await axios.post(apiUrl('/api/category'), formData, { headers: { 'Content-Type': 'multipart/form-data' } });
         }
         isModalOpen.value = false;
         await fetchCategories();
@@ -61,7 +82,7 @@ const saveCategory = async () => {
 const deleteCategory = async (id) => {
     if (confirm('Bạn có chắc chắn muốn xóa danh mục này? Các danh mục con cũng sẽ bị xóa theo!')) {
         try {
-            await axios.delete(`http://localhost:8888/api/category/${id}`);
+            await axios.delete(apiUrl(`/api/category/${id}`));
             message.value = 'Xóa danh mục thành công!';
             await fetchCategories();
         } catch (error) {
@@ -77,7 +98,15 @@ const handleFileUpload = (e) => { categoryForm.value.image = e.target.files[0]; 
 const categoryItems = ref([]);          
 const selectedParent = ref(null);       
 const isItemModalOpen = ref(false);
-const itemForm = ref({ id: null, category_id: null, name: '' });
+const itemForm = ref({
+    id: null,
+    category_id: null,
+    name: '',
+    slug: '',
+    seo_title: '',
+    meta_description: '',
+    seo_content: '',
+});
 const itemMessage = ref('');
 
 const fetchCategoryItems = async (category) => {
@@ -88,7 +117,9 @@ const fetchCategoryItems = async (category) => {
     }
     selectedParent.value = category;
     try {
-        const response = await axios.get(`http://localhost:8888/api/category-item?category_id=${category.id}`);
+        const response = await axios.get(apiUrl('/api/category-item'), {
+            params: { category_id: category.id },
+        });
         categoryItems.value = response.data.data;
         if (itemMessage.value) {
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: itemMessage.value, showConfirmButton: false, timer: 3000, timerProgressBar: true });
@@ -100,13 +131,29 @@ const fetchCategoryItems = async (category) => {
 };
 
 const openAddItemModal = () => {
-    itemForm.value = { id: null, category_id: selectedParent.value.id, name: '' };
+    itemForm.value = {
+        id: null,
+        category_id: selectedParent.value.id,
+        name: '',
+        slug: '',
+        seo_title: '',
+        meta_description: '',
+        seo_content: '',
+    };
     isItemModalOpen.value = true;
     itemMessage.value = 'Thêm danh mục con thành công!';
 };
 
 const editItem = (item) => {
-    itemForm.value = { id: item.id, category_id: item.category_id, name: item.name };
+    itemForm.value = {
+        id: item.id,
+        category_id: item.category_id,
+        name: item.name,
+        slug: item.slug || '',
+        seo_title: item.seo_title || '',
+        meta_description: item.meta_description || '',
+        seo_content: item.seo_content || '',
+    };
     isItemModalOpen.value = true;
     itemMessage.value = 'Sửa danh mục con thành công!';
 };
@@ -114,9 +161,9 @@ const editItem = (item) => {
 const saveItem = async () => {
     try {
         if (itemForm.value.id) {
-            await axios.post(`http://localhost:8888/api/category-item/update/${itemForm.value.id}`, itemForm.value);
+            await axios.post(apiUrl(`/api/category-item/update/${itemForm.value.id}`), itemForm.value);
         } else {
-            await axios.post('http://localhost:8888/api/category-item', itemForm.value);
+            await axios.post(apiUrl('/api/category-item'), itemForm.value);
         }
         isItemModalOpen.value = false;
         await fetchCategoryItems(selectedParent.value);
@@ -129,7 +176,7 @@ const saveItem = async () => {
 const deleteItem = async (id) => {
     if (confirm('Bạn có chắc chắn muốn xóa danh mục con này?')) {
         try {
-            await axios.delete(`http://localhost:8888/api/category-item/${id}`);
+            await axios.delete(apiUrl(`/api/category-item/${id}`));
             itemMessage.value = 'Xóa danh mục con thành công!';
             await fetchCategoryItems(selectedParent.value);
         } catch (error) {
@@ -195,7 +242,7 @@ const toggleTheme = () => {
                                             <td class="px-6 py-4 text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">#{{ index + 1 }}</td>
                                             <td class="px-6 py-4">
                                                 <div class="w-14 h-14 rounded-lg overflow-hidden border transition-transform duration-300 group-hover:scale-105" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-                                                    <img :src="'http://localhost:8888/images/' + cat.img" class="w-full h-full object-cover" :alt="cat.name">
+                                                    <img :src="imageUrl(cat.img)" class="w-full h-full object-cover" :alt="cat.name">
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4">
@@ -268,19 +315,43 @@ const toggleTheme = () => {
 
                 <!-- MODAL THÊM VÀ SỬA DANH MỤC CHA -->
                 <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-200 shadow-2xl'" class="w-full max-w-md rounded-xl border overflow-hidden">
+                    <div :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-200 shadow-2xl'" class="w-full max-w-2xl rounded-xl border overflow-hidden">
                         <div :class="isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50'" class="flex justify-between items-center px-6 py-4 border-b">
                             <h3 :class="isDark ? 'text-white' : 'text-gray-900'" class="text-lg font-semibold">{{ categoryForm.id ? 'Sửa danh mục' : 'Thêm danh mục' }}</h3>
                             <button @click="isModalOpen = false" :class="isDark ? 'text-gray-400 hover:text-white border-gray-700' : 'text-gray-500 hover:text-gray-900 border-gray-200'" class="w-8 h-8 flex items-center justify-center rounded-lg border transition-colors bg-white dark:bg-[#0f172a]">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <div class="px-6 py-6 space-y-5">
+                        <div class="max-h-[75vh] overflow-y-auto px-6 py-6 space-y-5">
                             <div>
                                 <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Tên danh mục <span class="text-red-500">*</span></label>
                                 <input type="text" v-model="categoryForm.name" placeholder="VD: Hoa Hồng"
                                     :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
                                     class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Slug SEO</label>
+                                <input type="text" v-model="categoryForm.slug" placeholder="hoa-hong"
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">SEO title</label>
+                                <input type="text" v-model="categoryForm.seo_title" maxlength="70" placeholder="Hoa hồng tươi giao nhanh"
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Meta description</label>
+                                <textarea v-model="categoryForm.meta_description" maxlength="170" rows="3" placeholder="Mô tả ngắn cho Google khi hiển thị danh mục hoa."
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full resize-none px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"></textarea>
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">SEO content</label>
+                                <textarea v-model="categoryForm.seo_content" rows="5" placeholder="Nội dung giới thiệu danh mục, chất lượng hoa, dịp sử dụng và cam kết giao hàng."
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full resize-y px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"></textarea>
                             </div>
                             <div>
                                 <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Hình ảnh danh mục</label>
@@ -304,7 +375,7 @@ const toggleTheme = () => {
 
                 <!-- ===== MODAL DANH MỤC CON ===== -->
                 <div v-if="isItemModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-200 shadow-2xl'" class="w-full max-w-md rounded-xl border overflow-hidden">
+                    <div :class="isDark ? 'bg-[#1e293b] border-gray-700' : 'bg-white border-gray-200 shadow-2xl'" class="w-full max-w-2xl rounded-xl border overflow-hidden">
                         <div :class="isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50'" class="flex justify-between items-center px-6 py-4 border-b">
                             <h3 :class="isDark ? 'text-white' : 'text-gray-900'" class="text-lg font-semibold">
                                 {{ itemForm.id ? 'Sửa danh mục con' : 'Thêm danh mục con' }}
@@ -314,11 +385,37 @@ const toggleTheme = () => {
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <div class="px-6 py-6">
-                            <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Tên danh mục con <span class="text-red-500">*</span></label>
-                            <input type="text" v-model="itemForm.name" placeholder="VD: Hoa Hồng Đỏ, Hoa Cẩm Chướng..."
-                                :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
-                                class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                        <div class="max-h-[75vh] overflow-y-auto px-6 py-6 space-y-5">
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Tên danh mục con <span class="text-red-500">*</span></label>
+                                <input type="text" v-model="itemForm.name" placeholder="VD: Hoa Hồng Đỏ, Hoa Cẩm Chướng..."
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Slug SEO</label>
+                                <input type="text" v-model="itemForm.slug" placeholder="hoa-hong-do"
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">SEO title</label>
+                                <input type="text" v-model="itemForm.seo_title" maxlength="70" placeholder="Hoa hồng đỏ tươi giao nhanh"
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all" />
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">Meta description</label>
+                                <textarea v-model="itemForm.meta_description" maxlength="170" rows="3" placeholder="Mô tả ngắn cho Google khi hiển thị nhóm hoa con."
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full resize-none px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"></textarea>
+                            </div>
+                            <div>
+                                <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1.5">SEO content</label>
+                                <textarea v-model="itemForm.seo_content" rows="5" placeholder="Nội dung mô tả nhóm hoa, màu sắc, ý nghĩa, dịp tặng và cách bảo quản."
+                                    :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                    class="w-full resize-y px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"></textarea>
+                            </div>
                         </div>
                         <div :class="isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50'" class="px-6 py-4 border-t flex justify-end space-x-3">
                             <button @click="isItemModalOpen = false" :class="isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 border'" class="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">Hủy bỏ</button>

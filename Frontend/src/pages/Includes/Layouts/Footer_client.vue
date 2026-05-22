@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import axios from "axios";
 import Swal from 'sweetalert2';
+import trailLoadingIcon from '../../../icons/svg/Trail loading.svg';
+import { apiUrl, defaultImageUrl, imageUrl } from '@/utils/api';
 
 const email = ref('');
 const isSupportOpen = ref(false);
@@ -31,6 +33,10 @@ const clickSuggestion = async (suggest) => {
 const formatPrice = (value) => {
   if (!value) return '';
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+};
+
+const setDefaultProductImage = (event) => {
+  event.target.src = defaultImageUrl;
 };
 
 const parseMarkdown = (text) => {
@@ -72,7 +78,7 @@ const sendChatbotMessage = async () => {
   chatbotLoading.value = true;
 
   try {
-    const response = await axios.post('http://localhost:8888/api/chatbot', { message });
+    const response = await axios.post(apiUrl('/api/chatbot'), { message });
     chatbotMessages.value.push({
       role: 'bot',
       content: response.data.reply || 'Mình chưa trả lời được câu này, bạn thử hỏi lại giúp mình nhé.',
@@ -99,7 +105,7 @@ const SubmitContact = async () => {
   }
 
   try {
-    const reponse = await axios.post("http://localhost:8888/api/SubmitContact", {
+    const reponse = await axios.post(apiUrl('/api/SubmitContact'), {
       email: email.value
     });
     if (reponse.data.status == "success") {
@@ -177,10 +183,10 @@ const SubmitContact = async () => {
   <!-- Floating Contact Widget -->
   <div class="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-4 font-sans">
     <!-- Phone Call Button -->
-    <a href="tel:0987654321" class="group flex items-center gap-3 relative cursor-pointer select-none">
+    <a href="tel:0911616211" class="group flex items-center gap-3 relative cursor-pointer select-none">
       <span
         class="absolute right-14 bg-red-500 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg opacity-0 translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 whitespace-nowrap z-[10000]">
-        Hotline: 0987.654.321
+        Hotline: 0911.616.211
       </span>
       <div
         class="w-12 h-12 flex items-center justify-center bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full shadow-lg group-hover:scale-110 transition-all duration-300 animate-phone-pulse relative">
@@ -273,7 +279,7 @@ const SubmitContact = async () => {
                   <div class="flex gap-2.5 px-1 py-1">
                     <div v-for="prod in message.products" :key="prod.id" class="flex-shrink-0 w-28 rounded-xl border border-pink-100 bg-white overflow-hidden shadow-xs hover:shadow-md transition duration-200 flex flex-col">
                       <div class="w-full h-20 bg-pink-50 flex items-center justify-center overflow-hidden relative">
-                        <img :src="'http://localhost:8888/images/' + prod.img" class="w-full h-full object-cover" :alt="prod.name" @error="(e) => { e.target.src = 'http://localhost:8888/images/default.jpg' }">
+                        <img :src="imageUrl(prod.img)" class="w-full h-full object-cover" :alt="prod.name" @error="setDefaultProductImage">
                       </div>
                       <div class="p-1.5 flex-1 flex flex-col justify-between">
                         <div>
@@ -293,7 +299,8 @@ const SubmitContact = async () => {
               </div>
               <div v-if="chatbotLoading" class="flex justify-start">
                 <div class="rounded-2xl rounded-bl-md bg-white px-4 py-2 text-sm text-gray-500 shadow-sm">
-                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                  <!-- Loading -->
+                  <img :src="trailLoadingIcon" alt="Đang xử lý" class="mr-2 inline-block h-6 w-6 align-middle">
                 </div>
               </div>
             </div>

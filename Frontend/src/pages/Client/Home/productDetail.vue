@@ -5,6 +5,8 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { buildProductSchema, getSeoDescription, getSeoTitle, setPageSeo } from '@/utils/seo';
+import { apiUrl, imageUrl } from '@/utils/api';
 
 const route = useRoute();
 const product = ref(null);
@@ -25,10 +27,28 @@ const toggleSection = (sec) => {
   expandedSections.value[sec] = !expandedSections.value[sec];
 };
 
+const updateProductSeo = () => {
+  if (!product.value) return;
+
+  const productPath = `/product/${product.value.slug || route.params.slug}`;
+
+  setPageSeo({
+    title: getSeoTitle(product.value, `${product.value.name} | TBS Flower Shop`),
+    description: getSeoDescription(
+      product.value,
+      `${product.value.name} is designed with fresh flowers for gifting and same-day delivery.`,
+    ),
+    path: productPath,
+    image: product.value.thumbnail,
+    type: 'product',
+    schema: buildProductSchema(product.value, productPath),
+  });
+};
+
 const loadProductData = async (slug) => {
   loading.value = true;
   try {
-    const response = await axios.get(`http://localhost:8888/api/product/${slug}`);
+    const response = await axios.get(apiUrl(`/api/product/${slug}`));
     if (response.data && response.data.data) {
       product.value = response.data.data;
     } else if (response.data) {
@@ -56,6 +76,7 @@ const loadProductData = async (slug) => {
       
       // Load related products
       await fetchRelatedProducts(product.value);
+      updateProductSeo();
     }
     loading.value = false;
   }
@@ -63,7 +84,7 @@ const loadProductData = async (slug) => {
 
 const fetchRelatedProducts = async (currentProduct) => {
   try {
-    const response = await axios.get('http://localhost:8888/api/product?limit=100');
+    const response = await axios.get(apiUrl('/api/product?limit=100'));
     const list = response.data.data || response.data;
     relatedProducts.value = list
       .filter(p => p.category_id === currentProduct.category_id && String(p.id) !== String(currentProduct.id))
@@ -158,6 +179,14 @@ const getMinPrice = (p) => {
   const prices = p.variants.map(v => Number(v.sale_price || v.price));
   return Math.min(...prices);
 };
+
+const getBestVariant = (productItem) => {
+  if (!productItem.variants?.length) return null;
+
+  return [...productItem.variants]
+    .filter((variant) => Number(variant.price) > 0)
+    .sort((a, b) => Number(a.sale_price || a.price) - Number(b.sale_price || b.price))[0] || null;
+};
 </script>
 
 <template>
@@ -226,8 +255,10 @@ const getMinPrice = (p) => {
         <section class="lg:col-span-6 space-y-6">
           <!-- Main Display Picture -->
           <div class="relative aspect-square overflow-hidden bg-gray-50 border border-gray-100 rounded-2xl group">
-            <img :src="'http://localhost:8888/images/' + activeImage" :alt="product.name"
-              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-in-out">
+            <img :src="imageUrl(activeImage)" :alt="product.image_alt || product.name"
+              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-in-out"
+              loading="eager"
+              decoding="async">
             
             <!-- Sale Badge on main pic -->
             <span v-if="selectedVariant && selectedVariant.sale_price"
@@ -248,7 +279,7 @@ const getMinPrice = (p) => {
                 @click="activeImage = img"
                 class="shrink-0 w-20 h-20 overflow-hidden border-2 bg-gray-50 transition-all duration-300 cursor-pointer hover:-translate-y-1"
                 :class="activeImage === img ? 'border-pink-600 scale-95 shadow-md shadow-pink-50' : 'border-gray-200 hover:border-pink-300'">
-                <img :src="'http://localhost:8888/images/' + img" class="w-full h-full object-cover object-center" />
+                <img :src="imageUrl(img)" :alt="product.image_alt || product.name" class="w-full h-full object-cover object-center" loading="lazy" decoding="async" />
               </button>
             </div>
 
@@ -264,7 +295,7 @@ const getMinPrice = (p) => {
           <!-- Title & Category Info -->
           <div>
             <span class="text-xs font-bold text-pink-600 uppercase tracking-[0.2em] block mb-3">
-              {{ product.category_item?.name || product.category?.name || 'Hoa mẫu thiết kế' }}
+              {{ product.categoryItem?.name || product.category_item?.name || product.category?.name || 'Hoa mẫu thiết kế' }}
             </span>
             <h1 class="text-4xl lg:text-5xl font-serif font-bold text-gray-900 tracking-tight leading-tight mb-4">
               {{ product.name }}
@@ -411,8 +442,14 @@ const getMinPrice = (p) => {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div v-for="related in relatedProducts" :key="related.id" class="group cursor-pointer flex flex-col">
             <router-link :to="'/product/' + related.slug" class="relative h-72 mb-4 overflow-hidden bg-gray-50 border border-gray-100 block">
-              <img :src="'http://localhost:8888/images/' + related.thumbnail" :alt="related.name"
-                class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out">
+                <span v-if="getDiscountPercent(getBestVariant(related))"
+                  class="absolute left-4 top-4 z-10 rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+                  -{{ getDiscountPercent(getBestVariant(related)) }}%
+                </span>
+                <img :src="imageUrl(related.thumbnail)" :alt="related.image_alt || related.name"
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700 ease-in-out"
+                loading="lazy"
+                decoding="async">
             </router-link>
             <div>
               <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mb-1 block">
@@ -423,7 +460,12 @@ const getMinPrice = (p) => {
                   {{ related.name }}
                 </h3>
               </router-link>
-              <p class="text-xs font-bold text-pink-600 mt-1">{{ formatVND(getMinPrice(related)) }}</p>
+              <div class="mt-1 flex flex-wrap items-center gap-2">
+                <p class="text-xs font-bold text-pink-600">{{ formatVND(getMinPrice(related)) }}</p>
+                <span v-if="getDiscountPercent(getBestVariant(related))" class="text-xs font-semibold text-emerald-600">
+                  Giảm {{ getDiscountPercent(getBestVariant(related)) }}%
+                </span>
+              </div>
             </div>
           </div>
         </div>

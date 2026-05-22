@@ -64,6 +64,21 @@ Route::post('/product', [ProductController::class, 'store']);
 Route::post('/product/update/{id}', [ProductController::class, 'update']);
 Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 Route::delete('/product/image/{imageId}', [ProductController::class, 'destroyImage']);
+Route::get('/seo/products', function () {
+    return response()->json(
+        \App\Models\Product::query()
+            ->select('id', 'name', 'slug', 'description', 'seo_title', 'meta_description', 'image_alt', 'thumbnail', 'category_id', 'category_item_id', 'is_active', 'created_at', 'updated_at')
+            ->with([
+                'category:id,name',
+                'categoryItem:id,category_id,name',
+                'variants:id,product_id,price,sale_price,stock,sku,is_active',
+                'images:id,product_id,image_path,is_main,sort_order',
+            ])
+            ->where('is_active', true)
+            ->orderBy('id')
+            ->get()
+    );
+});
 
 
 
@@ -71,5 +86,3 @@ Route::delete('/product/image/{imageId}', [ProductController::class, 'destroyIma
 Route::get('/me', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-

@@ -1,6 +1,34 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
+const setNoindexRobots = () => {
+  if (typeof document === 'undefined') return
+
+  let robotsMeta = document.head.querySelector('meta[name="robots"]')
+
+  if (!robotsMeta) {
+    robotsMeta = document.createElement('meta')
+    robotsMeta.setAttribute('name', 'robots')
+    document.head.appendChild(robotsMeta)
+  }
+
+  robotsMeta.setAttribute('content', 'noindex, nofollow')
+}
+
+const setIndexRobots = () => {
+  if (typeof document === 'undefined') return
+
+  let robotsMeta = document.head.querySelector('meta[name="robots"]')
+
+  if (!robotsMeta) {
+    robotsMeta = document.createElement('meta')
+    robotsMeta.setAttribute('name', 'robots')
+    document.head.appendChild(robotsMeta)
+  }
+
+  robotsMeta.setAttribute('content', 'index, follow')
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -12,17 +40,20 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../pages/Client/Auth/login.vue')
+      component: () => import('../pages/Client/Auth/login.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('../pages/Client/Auth/Register.vue')
+      component: () => import('../pages/Client/Auth/Register.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/forgot',
       name: 'forgot',
-      component: () => import('../pages/Client/Auth/Forgot.vue')
+      component: () => import('../pages/Client/Auth/Forgot.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/product',
@@ -32,17 +63,20 @@ const router = createRouter({
     {
       path: '/cart',
       name: 'cart',
-      component: () => import('../pages/Client/Cart/Index.vue')
+      component: () => import('../pages/Client/Cart/Index.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/checkout',
       name: 'checkout',
-      component: () => import('../pages/Client/Cart/Checkout.vue')
+      component: () => import('../pages/Client/Cart/Checkout.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/order-success',
       name: 'order-success',
-      component: () => import('../pages/Client/Cart/OrderSuccess.vue')
+      component: () => import('../pages/Client/Cart/OrderSuccess.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/contact',
@@ -72,7 +106,8 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'profile',
-      component: () => import('../pages/Client/Auth/Profile.vue')
+      component: () => import('../pages/Client/Auth/Profile.vue'),
+      meta: { noindex: true }
     },
     {
       path: '/product/:slug',
@@ -83,55 +118,68 @@ const router = createRouter({
       path: '/admin',
       name: 'admin-dashboard',
       component: () => import('../pages/Admin/dashboard.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/category',
       name: 'admin-category',
       component: () => import('../pages/Admin/category.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/product',
       name: 'admin-product',
-      component: () => import('../pages/Admin/product.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      component: () => import('../pages/Admin/Products/index.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
+    },
+    {
+      path: '/admin/product/add',
+      name: 'admin-product-add',
+      component: () => import('../pages/Admin/Products/add.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
+    },
+    {
+      path: '/admin/product/edit/:id',
+      name: 'admin-product-edit',
+      component: () => import('../pages/Admin/Products/edit.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/product/size',
       name: 'admin-product-size',
       component: () => import('../pages/Admin/size.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/user',
       name: 'admin-user',
       component: () => import('../pages/Admin/user.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/contact',
       name: 'admin-contact',
       component: () => import('../pages/Admin/contact.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/setting',
       name: 'admin-setting',
       component: () => import('../pages/Admin/setting.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
       path: '/admin/order',
       name: 'admin-order',
       component: () => import('../pages/Admin/order.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     // NOT FOUND 404
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: () => import('../pages/NotFound404/index.vue')
+      component: () => import('../pages/NotFound404/index.vue'),
+      meta: { noindex: true }
     },
   ],
   // Product detail scroll to top
@@ -178,6 +226,15 @@ router.beforeEach(async (to, from) => {
   }
 
   return true;
+})
+
+router.afterEach((to) => {
+  if (to.meta.noindex) {
+    setNoindexRobots()
+    return
+  }
+
+  setIndexRobots()
 })
 
 export default router

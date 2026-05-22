@@ -4,96 +4,132 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryItemController extends Controller
 {
-    /**
-     * Lấy danh sách danh mục con (theo category_id nếu có truyền vào).
-     * GET /api/category-item?category_id=1
-     */
     public function index(Request $request)
     {
         if ($request->has('category_id')) {
-            $items = CategoryItem::select('id', 'category_id', 'name')
+            $items = CategoryItem::select('id', 'category_id', 'name', 'slug', 'seo_title', 'meta_description', 'seo_content')
                 ->where('category_id', $request->category_id)
                 ->orderBy('id')
                 ->get();
         } else {
-            // Lấy tất cả, kèm thông tin danh mục cha luôn
-            $items = CategoryItem::select('id', 'category_id', 'name')
-                ->with('category:id,name,img')
+            $items = CategoryItem::select('id', 'category_id', 'name', 'slug', 'seo_title', 'meta_description', 'seo_content')
+                ->with('category:id,name,slug,img')
                 ->orderBy('category_id')
                 ->get();
         }
-         return response()->json([
+
+        return response()->json([
             'status' => 'success',
-            'data'   => $items,
+            'data' => $items,
         ]);
     }
 
-    /**
-     * Thêm danh mục con mới.
-     * POST /api/category-item
-     */
     public function store(Request $request)
     {
-        $request->validate([
-            'category_id' => 'required|integer|exists:category,id',
-            'name'        => 'required|string|max:50',
+        $validated = $request->validate([
+            'category_id' => ['required', 'integer', 'exists:category,id'],
+            'name' => ['required', 'string', 'max:50'],
+            'slug' => ['nullable', 'string', 'max:100'],
+            'seo_title' => ['nullable', 'string', 'max:70'],
+            'meta_description' => ['nullable', 'string', 'max:170'],
+            'seo_content' => ['nullable', 'string'],
         ]);
 
         $item = CategoryItem::create([
-            'category_id' => $request->category_id,
-            'name'        => $request->name,
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'slug' => $this->generateUniqueSlug($validated['slug'] ?? $validated['name']),
+            'seo_title' => $validated['seo_title'] ?? null,
+            'meta_description' => $validated['meta_description'] ?? null,
+            'seo_content' => $validated['seo_content'] ?? null,
         ]);
 
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Đã thêm danh mục con thành công',
-            'data'    => $item,
+            'status' => 'success',
+            'message' => 'Category item created successfully',
+            'data' => $item,
         ], 201);
     }
 
-    /**
-     * Cập nhật danh mục con.
-     * POST /api/category-item/update/{id}
-     */
     public function update(Request $request, $id)
     {
         $item = CategoryItem::find($id);
 
         if (!$item) {
-            return response()->json(['message' => 'Không tìm thấy danh mục con'], 404);
+            return response()->json(['message' => 'Category item not found'], 404);
         }
 
-        $item->category_id = $request->category_id ?? $item->category_id;
-        $item->name        = $request->name        ?? $item->name;
+        $validated = $request->validate([
+            'category_id' => ['nullable', 'integer', 'exists:category,id'],
+            'name' => ['nullable', 'string', 'max:50'],
+            'slug' => ['nullable', 'string', 'max:100'],
+            'seo_title' => ['nullable', 'string', 'max:70'],
+            'meta_description' => ['nullable', 'string', 'max:170'],
+            'seo_content' => ['nullable', 'string'],
+        ]);
+
+        $originalName = $item->name;
+        $item->category_id = $validated['category_id'] ?? $item->category_id;
+        $item->name = $validated['name'] ?? $item->name;
+
+        if (!empty($validated['slug'])) {
+            $item->slug = $this->generateUniqueSlug($validated['slug'], $item->id);
+        } elseif ($item->name !== $originalName) {
+            $item->slug = $this->generateUniqueSlug($item->name, $item->id);
+        }
+
+        foreach (['seo_title', 'meta_description', 'seo_content'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $item->{$field} = $validated[$field];
+            }
+        }
         $item->save();
 
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Đã cập nhật danh mục con thành công',
-            'data'    => $item,
+            'status' => 'success',
+            'message' => 'Category item updated successfully',
+            'data' => $item,
         ]);
     }
 
-    /**
-     * Xoá danh mục con.
-     * DELETE /api/category-item/{id}
-     */
     public function destroy($id)
     {
         $item = CategoryItem::find($id);
 
         if (!$item) {
-            return response()->json(['message' => 'Không tìm thấy danh mục con'], 404);
+            return response()->json(['message' => 'Category item not found'], 404);
         }
 
         $item->delete();
 
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Đã xoá danh mục con thành công',
+            'status' => 'success',
+            'message' => 'Category item deleted successfully',
         ]);
+    }
+
+    private function generateUniqueSlug(string $value, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($value);
+        $base = $base !== '' ? $base : 'category-item';
+        $base = substr($base, 0, 90);
+        $slug = $base;
+        $counter = 2;
+
+        while (
+            CategoryItem::query()
+                ->where('slug', $slug)
+                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $suffix = '-' . $counter++;
+            $slug = substr($base, 0, 100 - strlen($suffix)) . $suffix;
+        }
+
+        return $slug;
     }
 }
