@@ -46,7 +46,7 @@ setPageSeo({
             </div>
         </header>
         <div
-            class="bg-primary-light dark:bg-gray-900 py-16 md:py-24 text-center border-b border-pink-100 dark:border-gray-800 transition-colors duration-300">
+            class="bg-gradient-to-r from-rose-50 via-amber-50 to-indigo-50 dark:from-gray-900 dark:to-gray-950 py-16 md:py-24 text-center border-b border-pink-100/50 dark:border-gray-800 transition-colors duration-300">
             <div class="max-w-3xl mx-auto px-4">
                 <p class="text-xs font-bold tracking-widest text-primary uppercase mb-4">Pháp lý</p>
                 <h1

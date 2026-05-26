@@ -93,6 +93,12 @@ const getLinkClass = (path, exact = false) => {
                 <span :class="isExpanded ? 'opacity-100 ml-4' : 'opacity-0 w-0 h-0 overflow-hidden'" class="transition-all duration-300">Danh mục</span>
             </router-link>
 
+            <!-- Coupon -->
+            <router-link replace to="/admin/coupon" :class="getLinkClass('/admin/coupon')" class="flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors w-full group/item cursor-pointer">
+                <i class="fa-solid fa-tags text-lg shrink-0 transition-transform duration-300 group-hover/item:scale-110"></i>
+                <span :class="isExpanded ? 'opacity-100 ml-4' : 'opacity-0 w-0 h-0 overflow-hidden'" class="transition-all duration-300">Mã giảm giá</span>
+            </router-link>
+
             <!-- Order -->
             <router-link replace to="/admin/order" :class="getLinkClass('/admin/order')" class="flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors w-full group/item cursor-pointer">
                 <i class="fa-solid fa-cart-shopping text-lg shrink-0 transition-transform duration-300 group-hover/item:scale-110"></i>

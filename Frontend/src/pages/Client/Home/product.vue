@@ -229,11 +229,11 @@ onMounted(async () => {
     <Header_client />
 
     <!-- Hero Section for Products -->
-    <div class="bg-pink-100 border-b border-gray-100 py-24">
+    <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-indigo-50 border-b border-pink-100/50 py-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span class="text-xs uppercase tracking-[0.4em] mb-4 block font-medium text-pink-600">Tuyển tập hoa mới
+        <span class="text-xs uppercase tracking-[0.4em] mb-4 block font-semibold text-pink-600">Tuyển tập hoa mới
           nhất</span>
-        <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-6 italic leading-tight">Cửa hàng hoa</h1>
+        <h1 class="text-5xl md:text-7xl font-serif font-bold text-gray-900 mb-6 italic leading-tight">Cửa hàng hoa</h1>
         <p class="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">Khám phá các mẫu hoa tươi theo dịp, được thiết kế tinh tế từ nguyên liệu chọn lọc mỗi ngày.</p>
       </div>
     </div>

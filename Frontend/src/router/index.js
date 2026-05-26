@@ -157,6 +157,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {
+      path: '/admin/coupon',
+      name: 'admin-coupon',
+      component: () => import('../pages/Admin/coupon.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
+    },
+    {
       path: '/admin/contact',
       name: 'admin-contact',
       component: () => import('../pages/Admin/contact.vue'),
