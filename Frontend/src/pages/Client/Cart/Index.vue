@@ -9,7 +9,7 @@ import Footer_Client from '@/pages/Includes/Layouts/Footer_client.vue';
 <template>
     <Header_Client />
     <div class="min-h-screen bg-[#fbf7f8] text-gray-900">
-        <section class="bg-gradient-to-r from-pink-50 via-rose-50 to-pink-100 border-b border-pink-100 py-16 md:py-20">
+        <section class="bg-gradient-to-r from-rose-50 via-amber-50 to-indigo-50 border-b border-pink-100/50 py-16 md:py-20">
             <div class="container mx-auto px-4 text-center">
                 <span class="text-xs uppercase tracking-[0.35em] mb-4 block font-semibold text-pink-600">
                     GIỎ HÀNG CỦA BẠN

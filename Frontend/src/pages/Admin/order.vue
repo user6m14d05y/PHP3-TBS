@@ -50,7 +50,7 @@ const toggleTheme = () => {
                             class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-6 border-b gap-4 sm:gap-0">
                             <div>
                                 <h2 :class="isDark ? 'text-white' : 'text-gray-900'"
-                                    class="text-3xl font-serif font-bold mb-2">Đơn hàng</h2>
+                                    class="text-3xl font-serif font-bold mb-2">Quản Lý Đơn hàng</h2>
                                 <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="font-light text-sm">Bảng
                                     điều khiển quản lý đơn hàng hiển thị.</p>
                             </div>

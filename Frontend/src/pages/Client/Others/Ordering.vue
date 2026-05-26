@@ -14,7 +14,7 @@ setPageSeo({
 <template>
     <Header_Client />
     <div class="min-h-screen bg-[#fbf7f8] text-gray-900">
-        <section class="bg-gradient-to-r from-pink-50 via-rose-50 to-pink-100 py-16 md:py-20 text-center border-b border-pink-100">
+        <section class="bg-gradient-to-r from-rose-50 via-amber-50 to-indigo-50 py-16 md:py-20 text-center border-b border-pink-100/50">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <span class="text-pink-600 text-xs font-semibold tracking-[0.3em] uppercase mb-4 block">Hỗ trợ khách hàng</span>
                 <h1 class="text-4xl md:text-6xl font-bold mb-5 text-gray-900">Hướng dẫn đặt hàng</h1>
