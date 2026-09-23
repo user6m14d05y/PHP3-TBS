@@ -229,11 +229,11 @@ onMounted(async () => {
     <Header_client />
 
     <!-- Hero Section for Products -->
-    <div class="bg-pink-100 border-b border-gray-100 py-24">
+    <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-indigo-50 border-b border-pink-100/50 py-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span class="text-xs uppercase tracking-[0.4em] mb-4 block font-medium text-pink-600">Tuyển tập hoa mới
+        <span class="text-xs uppercase tracking-[0.4em] mb-4 block font-semibold text-pink-600">Tuyển tập hoa mới
           nhất</span>
-        <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-6 italic leading-tight">Cửa hàng hoa</h1>
+        <h1 class="text-5xl md:text-7xl font-serif font-bold text-gray-900 mb-6 italic leading-tight">Cửa hàng hoa</h1>
         <p class="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">Khám phá các mẫu hoa tươi theo dịp, được thiết kế tinh tế từ nguyên liệu chọn lọc mỗi ngày.</p>
       </div>
     </div>
@@ -349,8 +349,8 @@ onMounted(async () => {
           </div>
 
           <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div v-for="product in paginatedProducts" :key="product.id" class="group cursor-pointer flex flex-col">
-                <router-link :to="'/product/' + product.slug" class="relative h-80 mb-4 overflow-hidden bg-gray-100 block">
+              <div v-for="product in paginatedProducts" :key="product.id" class="group cursor-pointer flex flex-col transition-all duration-500 ease-out hover:-translate-y-2">
+                <router-link :to="'/product/' + product.slug" class="relative h-80 mb-4 overflow-hidden bg-gray-100 block rounded-xl shadow-sm group-hover:shadow-xl transition-shadow duration-500">
                   <span v-if="isNewProduct(product)"
                     class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
                     New

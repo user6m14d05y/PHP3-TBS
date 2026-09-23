@@ -14,7 +14,7 @@ setPageSeo({
 <template>
     <Header_Client />
     <div class="min-h-screen bg-[#fbf7f8] text-gray-900">
-        <section class="bg-gradient-to-r from-pink-50 via-rose-50 to-pink-100 py-16 md:py-20 text-center border-b border-pink-100">
+        <section class="bg-gradient-to-r from-rose-50 via-amber-50 to-indigo-50 py-16 md:py-20 text-center border-b border-pink-100/50">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <span class="text-pink-600 font-semibold tracking-[0.3em] uppercase text-xs mb-4 block">Chúng tôi luôn lắng nghe</span>
                 <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-5">Liên hệ & góp ý</h1>
@@ -113,7 +113,7 @@ setPageSeo({
 
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2" for="message">Lời nhắn *</label>
-                                <textarea class="block w-full rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-pink-300 focus:ring-pink-200 sm:text-sm transition-colors px-4 py-3" id="message" name="message" placeholder="Viết nội dung lời nhắn của bạn ở đây..." required rows="5"></textarea>
+                                <textarea rows="11" class="block w-full rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-pink-300 focus:ring-pink-200 sm:text-sm transition-colors px-4 py-3.5" id="message" name="message" placeholder="Viết nội dung lời nhắn của bạn ở đây..." required></textarea>
                             </div>
 
                             <button class="w-full flex justify-center items-center gap-2 py-4 px-6 rounded-full text-base font-bold text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-400 transition-colors shadow-lg shadow-pink-100" type="submit">

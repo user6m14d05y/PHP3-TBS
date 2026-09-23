@@ -47,14 +47,24 @@ class AuthController extends Controller
             }
         }
 
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
+            'role' => ['nullable', 'string', 'in:admin,user'],
+            'password' => ['nullable', 'string', 'min:6'],
+        ]);
+
         $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role
+            'name' => $validated['name'],
+            'email' => $validated['email'],
         ];
 
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+        if (isset($validated['role'])) {
+            $data['role'] = $validated['role'];
+        }
+
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
         }
 
         $user->update($data);
@@ -67,6 +77,12 @@ class AuthController extends Controller
 
     public function destroy($id) {
         $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy người dùng!'
+            ], 404);
+        }
         $user->delete();
         return response()->json([
             'status' => 'success',
@@ -76,19 +92,16 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        if (User::where('email', $request->email)->exists()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => [
-                    'email' => ['Địa chỉ email này đã được sử dụng!']
-                ]
-            ], 422); 
-        }
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:6'],
+        ]);
 
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), 
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']), 
             'role' => 'user'
         ]);
 
@@ -100,9 +113,14 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
+        ]);
 
-        if ($user && Hash::check($request->password, $user->password)) {
+        $user = User::where('email', $validated['email'])->first();
+
+        if ($user && Hash::check($validated['password'], $user->password)) {
             $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
                 'status' => 'success',

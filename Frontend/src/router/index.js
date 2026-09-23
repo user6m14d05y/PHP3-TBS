@@ -110,6 +110,18 @@ const router = createRouter({
       meta: { noindex: true }
     },
     {
+      path: '/profile/order',
+      name: 'profile-order',
+      component: () => import('../pages/Client/Auth/Order.vue'),
+      meta: { noindex: true }
+    },
+    {
+      path: '/profile/address',
+      name: 'profile-address',
+      component: () => import('../pages/Client/Auth/Address.vue'),
+      meta: { noindex: true }
+    },
+    {
       path: '/product/:slug',
       name: 'product-detail',
       component: () => import('../pages/Client/Home/productDetail.vue')
@@ -154,6 +166,12 @@ const router = createRouter({
       path: '/admin/user',
       name: 'admin-user',
       component: () => import('../pages/Admin/user.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
+    },
+    {
+      path: '/admin/coupon',
+      name: 'admin-coupon',
+      component: () => import('../pages/Admin/coupon.vue'),
       meta: { requiresAuth: true, requiresAdmin: true, noindex: true }
     },
     {

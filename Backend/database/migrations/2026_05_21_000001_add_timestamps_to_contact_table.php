@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contact', function (Blueprint $table) {
-            $table->timestamps();
-        });
+        // Already created by 2026_03_19_074530_create_contact_table.php.
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('contact', function (Blueprint $table) {
-            $table->dropTimestamps();
-        });
+        //
     }
 };

@@ -2,13 +2,19 @@
 import Footer_client from '@/pages/Includes/Layouts/Footer_client.vue';
 import Header_client from '@/pages/Includes/Layouts/Header_client.vue';
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { buildProductSchema, getSeoDescription, getSeoTitle, setPageSeo } from '@/utils/seo';
 import { apiUrl, imageUrl } from '@/utils/api';
+import { useCartStore } from '@/stores/cart';
+import { useAuthStore } from '@/stores/auth';
+import { getErrorMessage } from '@/utils/http';
 
 const route = useRoute();
+const router = useRouter();
+const cartStore = useCartStore();
+const authStore = useAuthStore();
 const product = ref(null);
 const loading = ref(true);
 const activeImage = ref('');
@@ -161,17 +167,41 @@ const selectVariant = (variant) => {
   quantity.value = 1; // Reset quantity on variant switch
 };
 
-const handleAddToCart = () => {
-  if (!product.value || !selectedVariant.value) return;
-  Swal.fire({
-    icon: 'success',
-    title: 'Đã thêm vào giỏ hàng!',
-    text: `Đã thêm ${quantity.value} sản phẩm "${product.value.name}" (Kích thước: ${selectedVariant.value?.size?.name || 'Tiêu chuẩn'}) vào giỏ hàng của bạn.`,
-    showConfirmButton: false,
-    timer: 2500,
-    timerProgressBar: true,
-    confirmButtonColor: '#db2777'
-  });
+const handleAddToCart = async () => {
+  if (!product.value || !selectedVariant.value?.id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Vui lòng chọn kích thước',
+      text: 'Hãy chọn kích thước sản phẩm trước khi thêm vào giỏ hàng.',
+      confirmButtonColor: '#db2777'
+    });
+    return;
+  }
+
+  try {
+    await cartStore.addToCart(selectedVariant.value.id, quantity.value);
+    Swal.fire({
+      icon: 'success',
+      title: 'Đã thêm vào giỏ hàng!',
+      text: `Đã thêm ${quantity.value} sản phẩm "${product.value.name}" (Kích thước: ${selectedVariant.value?.size?.name || 'Tiêu chuẩn'}) vào giỏ hàng của bạn.`,
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      confirmButtonColor: '#db2777'
+    });
+  } catch (error) {
+    if (error.response?.status === 401) {
+      authStore.logout();
+      router.push({ name: 'login', query: { redirect: route.fullPath } });
+      return;
+    }
+    Swal.fire({
+      icon: 'error',
+      title: 'Thêm vào giỏ hàng thất bại',
+      text: getErrorMessage(error, 'Không thể thêm sản phẩm vào giỏ hàng.'),
+      confirmButtonColor: '#db2777'
+    });
+  }
 };
 
 const getMinPrice = (p) => {

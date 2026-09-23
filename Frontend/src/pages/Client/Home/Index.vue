@@ -105,14 +105,16 @@ onMounted(() => {
     <section class="relative flex h-screen min-h-[560px] w-full items-center justify-center overflow-hidden bg-gray-950 sm:min-h-[640px] lg:min-h-[760px]">
       <video
         class="absolute inset-0 h-full w-full object-cover"
-        :src="videoUrl('video.mp4')"
         autoplay
         muted
         loop
         playsinline
-        preload="metadata"
+        :poster="imageUrl('video-fallback.jpg')"
         aria-label="Hero Banner"
-      ></video>
+      >
+        <source :src="videoUrl('video.webm')" type="video/webm">
+        <source :src="videoUrl('video.mp4')" type="video/mp4">
+      </video>
       <div class="absolute inset-0 bg-black/45 sm:bg-black/40 lg:bg-black/35"></div>
 
       <div class="relative z-10 mx-auto w-full max-w-3xl px-5 text-center text-white sm:px-6">
@@ -137,7 +139,7 @@ onMounted(() => {
         <div class="w-12 h-0.5 bg-pink-300 mx-auto mt-4"></div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 justify-center">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 justify-center">
         <div 
           v-for="cat in categories" 
           :key="cat.id" 
@@ -179,8 +181,8 @@ onMounted(() => {
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div v-for="product in featuredProducts" :key="product.id" class="group cursor-pointer flex flex-col">
-          <router-link :to="'/product/' + product.slug" class="relative h-96 mb-4 overflow-hidden bg-gray-100 block">
+        <div v-for="product in featuredProducts" :key="product.id" class="group cursor-pointer flex flex-col transition-all duration-500 ease-out hover:-translate-y-2">
+          <router-link :to="'/product/' + product.slug" class="relative h-96 mb-4 overflow-hidden bg-gray-100 block rounded-xl shadow-sm group-hover:shadow-xl transition-shadow duration-500">
             <span v-if="isNewProduct(product)"
               class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
               New

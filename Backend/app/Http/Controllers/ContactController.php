@@ -30,17 +30,11 @@ class ContactController extends Controller
     }
     public function SubmitContact(Request $request)
     {
-        $email = $request->input('email');
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:contacts,email']
+        ]);
 
-        // Check email validate — dùng Eloquent thay raw SQL
-        if (Contact::where('email', $email)->exists()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => [
-                    'email' => ['Địa chỉ email này đã được sử dụng!']
-                ]
-            ], 422); 
-        }
+        $email = $validated['email'];
 
         // Insert data — dùng Eloquent
         Contact::create(['email' => $email]);

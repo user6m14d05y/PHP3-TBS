@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../../stores/auth';
 import trailLoadingIcon from '../../../icons/svg/Trail loading.svg';
 import { apiUrl } from '@/utils/api';
@@ -14,6 +14,7 @@ const isSubmitting = ref(false);
 import Swal from 'sweetalert2';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 
 const login = async () => {
@@ -42,10 +43,13 @@ const login = async () => {
       authStore.user = response.data.user;
       authStore.isLoaded = true;
       
-      if (response.data.user.role === 'admin') {
-         router.replace('/admin');
+      const redirect = route.query.redirect;
+      if (redirect) {
+        router.replace(String(redirect));
+      } else if (response.data.user.role === 'admin') {
+        router.replace('/admin');
       } else {
-         router.replace('/');
+        router.replace('/');
       }
     }
   } catch (error) {
