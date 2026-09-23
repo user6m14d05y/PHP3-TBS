@@ -1,13 +1,15 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuthStore } from '../../../stores/auth';
+import { useCartStore } from '../../../stores/cart';
 import { apiUrl, imageUrl } from '@/utils/api';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const cartStore = useCartStore();
 
 const isHomePage = computed(() => route.path === '/');
 const isScrolled = ref(false);
@@ -108,6 +110,15 @@ onMounted(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
 });
 
+// Đồng bộ giỏ hàng với trạng thái đăng nhập
+watch(() => authStore.user, (user) => {
+    if (user) {
+        cartStore.fetchCart();
+    } else {
+        cartStore.reset();
+    }
+}, { immediate: true });
+
 onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleKeydown);
     window.removeEventListener('scroll', handleScroll);
@@ -165,7 +176,7 @@ const getLinkClass = (to) => {
 
                     <router-link replace to="/cart" class="transition relative" :class="hasLightHeader ? 'text-gray-500 hover:text-pink-600' : 'text-white/90 hover:text-white'">
                         <i class="fa-solid fa-bag-shopping text-xl"></i>
-                        <span class="absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm">2</span>
+                        <span v-if="cartStore.count > 0" class="absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm">{{ cartStore.count }}</span>
                     </router-link>
 
                     <router-link v-if="!isLoggedIn" to="/login" class="transition relative" :class="hasLightHeader ? 'text-gray-500 hover:text-pink-600' : 'text-white/90 hover:text-white'">

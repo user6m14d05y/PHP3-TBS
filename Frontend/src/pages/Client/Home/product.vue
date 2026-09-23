@@ -349,8 +349,8 @@ onMounted(async () => {
           </div>
 
           <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div v-for="product in paginatedProducts" :key="product.id" class="group cursor-pointer flex flex-col">
-                <router-link :to="'/product/' + product.slug" class="relative h-80 mb-4 overflow-hidden bg-gray-100 block">
+              <div v-for="product in paginatedProducts" :key="product.id" class="group cursor-pointer flex flex-col transition-all duration-500 ease-out hover:-translate-y-2">
+                <router-link :to="'/product/' + product.slug" class="relative h-80 mb-4 overflow-hidden bg-gray-100 block rounded-xl shadow-sm group-hover:shadow-xl transition-shadow duration-500">
                   <span v-if="isNewProduct(product)"
                     class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
                     New

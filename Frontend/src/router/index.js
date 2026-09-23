@@ -110,6 +110,18 @@ const router = createRouter({
       meta: { noindex: true }
     },
     {
+      path: '/profile/order',
+      name: 'profile-order',
+      component: () => import('../pages/Client/Auth/Order.vue'),
+      meta: { noindex: true }
+    },
+    {
+      path: '/profile/address',
+      name: 'profile-address',
+      component: () => import('../pages/Client/Auth/Address.vue'),
+      meta: { noindex: true }
+    },
+    {
       path: '/product/:slug',
       name: 'product-detail',
       component: () => import('../pages/Client/Home/productDetail.vue')

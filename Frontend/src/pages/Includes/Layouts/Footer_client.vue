@@ -52,7 +52,7 @@ const parseMarkdown = (text) => {
   escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>');
   
   // Replace bullet points starting with * or - with cute lists
-  escaped = escaped.replace(/(?:^|\n)\s*[\*\-]\s*(.*?)(?=\n|$)/g, '<div class="pl-2.5 py-0.5 flex items-start gap-1"><span class="text-pink-500">•</span> <span>$1</span></div>');
+  escaped = escaped.replace(/(?:^|\n)\s*[*-]\s*(.*?)(?=\n|$)/g, '<div class="pl-2.5 py-0.5 flex items-start gap-1"><span class="text-pink-500">•</span> <span>$1</span></div>');
   
   // Replace line breaks with HTML line breaks
   escaped = escaped.replace(/\n/g, '<br>');
