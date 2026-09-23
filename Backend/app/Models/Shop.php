@@ -17,6 +17,9 @@ class Shop extends Model
         'latitude',
         'longitude',
         'delivery_radius_km',
+        'bank_name',
+        'bank_account_number',
+        'bank_account_holder',
         'is_active',
     ];
 

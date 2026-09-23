@@ -11,6 +11,8 @@ use App\Models\UserAddress;
 use App\Services\CouponService;
 use App\Services\GeoDistanceService;
 use App\Services\OrderCodeService;
+use App\Services\OrderStatusService;
+use App\Services\ShippingFeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -21,13 +23,15 @@ class CheckoutController extends Controller
         Request $request,
         CouponService $couponService,
         GeoDistanceService $geoDistance,
-        OrderCodeService $orderCodeService
+        OrderCodeService $orderCodeService,
+        ShippingFeeService $shippingFeeService
     ) {
         $validated = $request->validate([
             'shop_id' => ['required', 'integer', 'exists:shops,id'],
             'user_address_id' => ['required', 'integer', 'exists:user_addresses,id'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
             'payment_method' => ['nullable', 'string', 'max:50'],
+            'shipping_method' => ['nullable', 'string', 'in:standard,express'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -78,7 +82,8 @@ class CheckoutController extends Controller
             $shop,
             $distanceKm,
             $couponService,
-            $orderCodeService
+            $orderCodeService,
+            $shippingFeeService
         ) {
             $items = $this->freshCartItems($cart);
             $subtotal = round($items->sum('line_total'), 2);
@@ -98,7 +103,7 @@ class CheckoutController extends Controller
                 $discountAmount = $couponResult['discount_amount'];
             }
 
-            $shippingFee = $this->calculateShippingFee($distanceKm);
+            $shippingFee = $shippingFeeService->calculate($distanceKm, $validated['shipping_method'] ?? 'standard');
             $totalAmount = round(max($subtotal - $discountAmount, 0) + $shippingFee, 2);
 
             $order = Order::create([
@@ -121,6 +126,7 @@ class CheckoutController extends Controller
                 'status' => 'awaiting_payment',
                 'payment_status' => 'pending',
                 'payment_method' => $validated['payment_method'] ?? null,
+                'shipping_method' => $validated['shipping_method'] ?? 'standard',
                 'note' => $validated['note'] ?? null,
             ]);
 
@@ -168,7 +174,7 @@ class CheckoutController extends Controller
             }
 
             $order->update([
-                'status' => 'paid',
+                'status' => $order->status === 'awaiting_payment' ? 'paid' : $order->status,
                 'payment_status' => 'paid',
             ]);
 
@@ -188,11 +194,11 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function paymentFailed(Order $order, CouponService $couponService)
+    public function paymentFailed(Order $order, CouponService $couponService, OrderStatusService $orderStatusService)
     {
         $this->assertAdmin(request());
 
-        DB::transaction(function () use ($order, $couponService) {
+        DB::transaction(function () use ($order, $couponService, $orderStatusService) {
             $order->refresh();
 
             if ($order->payment_status === 'paid') {
@@ -205,24 +211,7 @@ class CheckoutController extends Controller
                 return;
             }
 
-            $order->update([
-                'status' => 'cancelled',
-                'payment_status' => 'failed',
-            ]);
-
-            $order->items()->each(function ($item) {
-                ProductVariant::query()
-                    ->whereKey($item->product_variant_id)
-                    ->increment('stock', $item->quantity);
-            });
-
-            $usage = $order->coupon
-                ? $order->coupon->usages()->where('order_id', $order->id)->where('status', 'reserved')->first()
-                : null;
-
-            if ($usage) {
-                $couponService->release($usage);
-            }
+            $orderStatusService->cancel($order, $couponService);
         });
 
         return response()->json([
@@ -276,14 +265,6 @@ class CheckoutController extends Controller
             $address->district,
             $address->city,
         ])->filter()->implode(', ');
-    }
-
-    private function calculateShippingFee(float $distanceKm): float
-    {
-        $baseFee = 15000;
-        $feePerKm = 5000;
-
-        return round($baseFee + (ceil($distanceKm) * $feePerKm), 2);
     }
 
     private function assertAdmin(Request $request): void

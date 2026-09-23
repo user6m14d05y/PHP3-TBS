@@ -14,6 +14,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserAddressController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminOrderController;
 
 Route::get('/', function () {
     return response()->json([
@@ -46,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/coupons/apply', [CouponController::class, 'apply']);
     Route::post('/checkout', [CheckoutController::class, 'store']);
+
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
 });
 
 
@@ -129,6 +135,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Payment status routes. Replace these with signed payment webhooks before production.
     Route::post('/orders/{order}/payment-succeeded', [CheckoutController::class, 'paymentSucceeded']);
     Route::post('/orders/{order}/payment-failed', [CheckoutController::class, 'paymentFailed']);
+
+    // Admin order management
+    Route::get('/admin/orders', [AdminOrderController::class, 'index']);
+    Route::get('/admin/orders/{order}', [AdminOrderController::class, 'show']);
+    Route::patch('/admin/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
 });
 
 

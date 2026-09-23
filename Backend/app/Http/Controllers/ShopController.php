@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Services\GeoDistanceService;
+use App\Services\ShippingFeeService;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -67,7 +68,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function deliveryCheck(Request $request, GeoDistanceService $geoDistance)
+    public function deliveryCheck(Request $request, GeoDistanceService $geoDistance, ShippingFeeService $shippingFeeService)
     {
         $validated = $request->validate([
             'shop_id' => ['required', 'integer', 'exists:shops,id'],
@@ -95,6 +96,7 @@ class ShopController extends Controller
                 'distance_km' => $distanceKm,
                 'delivery_radius_km' => (float) $shop->delivery_radius_km,
                 'can_deliver' => $canDeliver,
+                'shipping_fees' => $shippingFeeService->fees($distanceKm),
             ],
         ]);
     }
@@ -114,6 +116,9 @@ class ShopController extends Controller
             'latitude' => [$required, 'numeric', 'between:-90,90'],
             'longitude' => [$required, 'numeric', 'between:-180,180'],
             'delivery_radius_km' => ['nullable', 'numeric', 'min:1', 'max:100'],
+            'bank_name' => ['nullable', 'string', 'max:100'],
+            'bank_account_number' => ['nullable', 'string', 'max:30'],
+            'bank_account_holder' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
         ]);
     }
