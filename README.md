@@ -69,3 +69,7 @@ docker-compose down -v
 npm install pinia axios
 ```
 
+## Các Cập Nhật Gần Đây (Updates)
+- **Geocoding Proxy:** Tích hợp `GeocodeController` ở Backend để gọi API của Nominatim (tránh lỗi thiếu User-Agent bị chặn khi Frontend gọi trực tiếp).
+- **Giỏ Hàng (Cart API):** API `/api/cart` đã được cập nhật để trả về thêm trường `product_thumbnail`, giúp Frontend tải đúng ảnh sản phẩm trong giỏ thay vì dùng ảnh mặc định.
+- **Quản lý biến môi trường (.env):** Trong Docker, lưu ý file `.env` của `backend` phải là một file độc lập (không dùng symlink) để tránh lỗi kẹt cấu hình (fallback về SQLite).

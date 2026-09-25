@@ -7,10 +7,10 @@ services:
     container_name: frontend-tbs
     working_dir: /app
     env_file:
-      - ./backend/.env
+      - ./.env
     volumes:
       - ./frontend:/app
-      - frontend_node_modules:/app/node_modules  # Cache node_modules riêng, không reinstall mỗi lần
+      - frontend_node_modules:/app/node_modules # Cache node_modules riêng, không reinstall mỗi lần
     ports:
       - "5173:5173"
     command: sh -c "npm install && npm run dev -- --host"
@@ -25,7 +25,7 @@ services:
       - ./backend:/var/www/html
     depends_on:
       db:
-        condition: service_healthy  # Chờ MySQL sẵn sàng mới start PHP
+        condition: service_healthy # Chờ MySQL sẵn sàng mới start PHP
       redis:
         condition: service_started
 
@@ -62,9 +62,9 @@ services:
       MYSQL_PASSWORD: root
     volumes:
       - db_data:/var/lib/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf  # Tuning config
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf # Tuning config
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -73,4 +73,4 @@ services:
 volumes:
   db_data:
   redis_data:
-  frontend_node_modules:  # Named volume cho node_modules — tránh reinstall
+  frontend_node_modules: # Named volume cho node_modules — tránh reinstall
