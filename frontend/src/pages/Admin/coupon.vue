@@ -1,6 +1,7 @@
 <script setup>
 import header_admin from '../Includes/Layouts/Header_Admin.vue';
 import navbar_admin from '../Includes/Layouts/Navbar_Admin.vue';
+import DateTimePicker from '@/components/DateTimePicker.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -222,25 +223,95 @@ const getStatusLabelAndClass = (coupon) => {
     if (!coupon.is_active) {
         return {
             text: 'Tạm ẩn',
-            class: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+            class: 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
         };
     }
     if (isExpired) {
         return {
             text: 'Hết hạn',
-            class: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+            class: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'
         };
     }
     if (starts && starts > now) {
         return {
             text: 'Chờ chạy',
-            class: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+            class: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
         };
     }
     return {
         text: 'Đang hoạt động',
-        class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+        class: 'bg-emerald-500 text-white border-emerald-600 shadow-sm dark:bg-emerald-600 dark:border-emerald-500'
     };
+};
+
+// Block non-numeric characters on keypress
+const filterKeyPress = (event, isFloat = false) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return true;
+    const key = event.key;
+    if (key === 'Backspace' || key === 'Delete' || key === 'Tab' || key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Home' || key === 'End') {
+        return true;
+    }
+    if (isFloat && key === '.') {
+        if (!event.target.value.includes('.')) {
+            return true;
+        }
+    }
+    if (!/^[0-9]$/.test(key)) {
+        event.preventDefault();
+        return false;
+    }
+    return true;
+};
+
+// Validate & clean numeric input on input event
+const handleNumberInput = (event, field, isFloat = false, isCondition = false) => {
+    const input = event.target;
+    let raw = input.value;
+    let cleaned = raw.replace(isFloat ? /[^0-9.]/g : /[^0-9]/g, '');
+    if (isFloat) {
+        const parts = cleaned.split('.');
+        if (parts.length > 2) {
+            cleaned = parts[0] + '.' + parts.slice(1).join('');
+        }
+    }
+    input.value = cleaned;
+    if (isCondition) {
+        if (!couponForm.value.conditions) couponForm.value.conditions = {};
+        couponForm.value.conditions[field] = cleaned;
+    } else {
+        couponForm.value[field] = cleaned;
+    }
+};
+
+// Handle pasted text to guarantee only numbers are inserted
+const handlePaste = (event, field, isFloat = false, isCondition = false) => {
+    event.preventDefault();
+    const pasted = (event.clipboardData || window.clipboardData).getData('text');
+    let cleaned = pasted.replace(isFloat ? /[^0-9.]/g : /[^0-9]/g, '');
+    if (isFloat) {
+        const parts = cleaned.split('.');
+        if (parts.length > 2) {
+            cleaned = parts[0] + '.' + parts.slice(1).join('');
+        }
+    }
+    const input = event.target;
+    const start = input.selectionStart || 0;
+    const end = input.selectionEnd || 0;
+    const currentVal = input.value || '';
+    let finalVal = currentVal.substring(0, start) + cleaned + currentVal.substring(end);
+    if (isFloat) {
+        const parts = finalVal.split('.');
+        if (parts.length > 2) {
+            finalVal = parts[0] + '.' + parts.slice(1).join('');
+        }
+    }
+    input.value = finalVal;
+    if (isCondition) {
+        if (!couponForm.value.conditions) couponForm.value.conditions = {};
+        couponForm.value.conditions[field] = finalVal;
+    } else {
+        couponForm.value[field] = finalVal;
+    }
 };
 
 // Open Add Modal
@@ -686,8 +757,8 @@ const saveCoupon = async () => {
 
                                     <!-- Status -->
                                     <td class="px-5 py-4 text-center whitespace-nowrap">
-                                        <div class="flex flex-col items-center space-y-1.5">
-                                            <span :class="getStatusLabelAndClass(coupon).class" class="px-2.5 py-0.5 text-xs font-semibold rounded-full shadow-sm">
+                                        <div class="flex flex-col items-center justify-center space-y-2">
+                                            <span :class="getStatusLabelAndClass(coupon).class" class="px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider rounded border">
                                                 {{ getStatusLabelAndClass(coupon).text }}
                                             </span>
                                             <!-- Interactive Toggle Switch -->
@@ -819,7 +890,12 @@ const saveCoupon = async () => {
                                 Giá trị giảm <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <input type="number" step="any" v-model="couponForm.discount_value" placeholder="10 hoặc 50000"
+                                <input type="text"
+                                    v-model="couponForm.discount_value"
+                                    @keypress="filterKeyPress($event, true)"
+                                    @input="handleNumberInput($event, 'discount_value', true)"
+                                    @paste="handlePaste($event, 'discount_value', true)"
+                                    placeholder="10 hoặc 50000"
                                     :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20'"
                                     class="w-full pl-3 pr-8 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
                                 <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-xs font-bold text-gray-400">
@@ -837,7 +913,13 @@ const saveCoupon = async () => {
                                 Giảm tối đa (Lên tới)
                             </label>
                             <div class="relative" :class="couponForm.discount_type !== 'percentage' ? 'opacity-40 pointer-events-none' : ''">
-                                <input type="number" step="any" v-model="couponForm.max_discount_amount" placeholder="VD: 50000" :disabled="couponForm.discount_type !== 'percentage'"
+                                <input type="text"
+                                    v-model="couponForm.max_discount_amount"
+                                    @keypress="filterKeyPress($event, true)"
+                                    @input="handleNumberInput($event, 'max_discount_amount', true)"
+                                    @paste="handlePaste($event, 'max_discount_amount', true)"
+                                    placeholder="VD: 50000"
+                                    :disabled="couponForm.discount_type !== 'percentage'"
                                     :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20'"
                                     class="w-full pl-3 pr-8 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
                                 <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-xs font-bold text-gray-400">₫</span>
@@ -851,7 +933,12 @@ const saveCoupon = async () => {
                         <div>
                             <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold uppercase tracking-wider mb-1.5">Giá trị đơn tối thiểu</label>
                             <div class="relative">
-                                <input type="number" step="any" v-model="couponForm.min_order_amount" placeholder="Không yêu cầu"
+                                <input type="text"
+                                    v-model="couponForm.min_order_amount"
+                                    @keypress="filterKeyPress($event, true)"
+                                    @input="handleNumberInput($event, 'min_order_amount', true)"
+                                    @paste="handlePaste($event, 'min_order_amount', true)"
+                                    placeholder="Không yêu cầu"
                                     :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20'"
                                     class="w-full pl-3 pr-8 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
                                 <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-xs font-bold text-gray-400">₫</span>
@@ -860,14 +947,24 @@ const saveCoupon = async () => {
                         </div>
                         <div>
                             <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold uppercase tracking-wider mb-1.5">Tổng số lượt dùng</label>
-                            <input type="number" v-model="couponForm.usage_limit" placeholder="Không giới hạn"
+                            <input type="text"
+                                v-model="couponForm.usage_limit"
+                                @keypress="filterKeyPress($event, false)"
+                                @input="handleNumberInput($event, 'usage_limit', false)"
+                                @paste="handlePaste($event, 'usage_limit', false)"
+                                placeholder="Không giới hạn"
                                 :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20'"
                                 class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
                             <span v-if="errors.usage_limit" class="text-red-500 text-xs mt-1 block font-medium">{{ errors.usage_limit[0] }}</span>
                         </div>
                         <div>
                             <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold uppercase tracking-wider mb-1.5">Lượt dùng / Mỗi User</label>
-                            <input type="number" v-model="couponForm.per_user_limit" placeholder="Mặc định: 1"
+                            <input type="text"
+                                v-model="couponForm.per_user_limit"
+                                @keypress="filterKeyPress($event, false)"
+                                @input="handleNumberInput($event, 'per_user_limit', false)"
+                                @paste="handlePaste($event, 'per_user_limit', false)"
+                                placeholder="Mặc định: 1"
                                 :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20'"
                                 class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
                             <span v-if="errors.per_user_limit" class="text-red-500 text-xs mt-1 block font-medium">{{ errors.per_user_limit[0] }}</span>
@@ -878,16 +975,24 @@ const saveCoupon = async () => {
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold uppercase tracking-wider mb-1.5">Thời gian bắt đầu</label>
-                            <input type="datetime-local" v-model="couponForm.starts_at"
-                                :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20'"
-                                class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
+                            <DateTimePicker
+                                v-model="couponForm.starts_at"
+                                placeholder="Bắt đầu"
+                                position="top"
+                                align="left"
+                                :isDark="isDark"
+                            />
                             <span v-if="errors.starts_at" class="text-red-500 text-xs mt-1 block font-medium">{{ errors.starts_at[0] }}</span>
                         </div>
                         <div>
                             <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold uppercase tracking-wider mb-1.5">Thời gian kết thúc</label>
-                            <input type="datetime-local" v-model="couponForm.expires_at"
-                                :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20'"
-                                class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
+                            <DateTimePicker
+                                v-model="couponForm.expires_at"
+                                placeholder="Kết thúc"
+                                position="top"
+                                align="right"
+                                :isDark="isDark"
+                            />
                             <span v-if="errors.expires_at" class="text-red-500 text-xs mt-1 block font-medium">{{ errors.expires_at[0] }}</span>
                         </div>
                     </div>
@@ -907,7 +1012,12 @@ const saveCoupon = async () => {
                                     <label :class="isDark ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold uppercase tracking-wider mb-1.5">
                                         Số lượng sản phẩm tối thiểu trong giỏ
                                     </label>
-                                    <input type="number" v-model="couponForm.conditions.min_quantity" placeholder="Ví dụ: 2 cái"
+                                    <input type="text"
+                                        v-model="couponForm.conditions.min_quantity"
+                                        @keypress="filterKeyPress($event, false)"
+                                        @input="handleNumberInput($event, 'min_quantity', false, true)"
+                                        @paste="handlePaste($event, 'min_quantity', false, true)"
+                                        placeholder="Ví dụ: 2 cái"
                                         :class="isDark ? 'bg-[#0f172a] border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500/20' : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20'"
                                         class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-4 transition-all" />
                                     <span v-if="errors['conditions.min_quantity']" class="text-red-500 text-xs mt-1 block font-medium">{{ errors['conditions.min_quantity'][0] }}</span>

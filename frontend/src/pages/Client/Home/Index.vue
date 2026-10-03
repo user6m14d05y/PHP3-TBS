@@ -73,6 +73,49 @@ const fetchCategories = () => {
   });
 }
 
+// Coupons data & actions
+const coupons = ref([]);
+const isLoadingCoupons = ref(false);
+const copiedCode = ref(null);
+
+const fetchCoupons = () => {
+  isLoadingCoupons.value = true;
+  axios.get(apiUrl('/api/coupons/public'))
+  .then(response => {
+    if (response.data.status === 'success') {
+      coupons.value = response.data.data || [];
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching coupons:', error);
+  })
+  .finally(() => {
+    isLoadingCoupons.value = false;
+  });
+};
+
+const formatCouponDate = (dateStr) => {
+  if (!dateStr) return 'Vô thời hạn';
+  const d = new Date(dateStr);
+  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+};
+
+const copyCouponCode = (code) => {
+  navigator.clipboard.writeText(code);
+  copiedCode.value = code;
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: `Đã sao chép mã: ${code}`,
+    showConfirmButton: false,
+    timer: 2000
+  });
+  setTimeout(() => {
+    if (copiedCode.value === code) copiedCode.value = null;
+  }, 3000);
+};
+
 const formatPrice = (price) => {
   if (!price) return 'Liên hệ';
 
@@ -133,6 +176,7 @@ setPageSeo({
 onMounted(() => {
   fetchProducts();
   fetchCategories();
+  fetchCoupons();
 });
 </script>
 
@@ -206,6 +250,95 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Voucher / Coupon Promotion Section -->
+    <section v-if="coupons.length > 0" class="bg-gradient-to-b from-pink-50/40 via-white to-white py-14 border-b border-pink-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
+          <div>
+            <div class="flex items-center space-x-2 text-pink-600 font-semibold text-xs uppercase tracking-[0.25em] mb-2">
+              <i class="fa-solid fa-gift text-sm"></i>
+              <span>Ưu Đãi Đặc Biệt</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 italic">Mã Giảm Giá Dành Cho Bạn</h2>
+            <p class="text-gray-500 font-light text-sm mt-1">Lưu ngay voucher để nhận ưu đãi giảm giá tốt nhất khi đặt hoa.</p>
+          </div>
+          <span class="text-xs bg-pink-100/70 text-pink-700 px-3.5 py-1.5 rounded-full font-semibold border border-pink-200/60 shadow-xs flex items-center">
+            <i class="fa-solid fa-ticket mr-1.5 text-pink-500"></i> {{ coupons.length }} mã ưu đãi sẵn sàng
+          </span>
+        </div>
+
+        <!-- Coupons Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            v-for="coupon in coupons"
+            :key="coupon.id"
+            class="relative flex bg-white border border-pink-200/80 rounded-2xl shadow-sm hover:shadow-xl hover:border-pink-300 transition-all duration-300 overflow-hidden group hover:-translate-y-1"
+          >
+            <!-- Left Ticket Accent Strip -->
+            <div class="w-3 bg-gradient-to-b from-pink-500 to-rose-400 shrink-0"></div>
+
+            <!-- Main Coupon Content -->
+            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-pink-50 text-pink-600 border border-pink-100">
+                    {{ coupon.discount_type === 'percentage' ? `Giảm ${parseFloat(coupon.discount_value)}%` : `Giảm ${formatPrice(coupon.discount_value)}` }}
+                  </span>
+                  <span v-if="coupon.discount_type === 'percentage' && coupon.max_discount_amount" class="text-[11px] text-gray-400">
+                    Tối đa {{ formatPrice(coupon.max_discount_amount) }}
+                  </span>
+                </div>
+
+                <h3 class="font-bold text-gray-900 text-base group-hover:text-pink-600 transition-colors line-clamp-1">
+                  {{ coupon.name || 'Mã giảm giá hấp dẫn' }}
+                </h3>
+
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                  {{ coupon.description || (coupon.min_order_amount ? `Áp dụng cho đơn hàng từ ${formatPrice(coupon.min_order_amount)}.` : 'Áp dụng cho mọi đơn hàng.') }}
+                </p>
+              </div>
+
+              <!-- Extra Conditions & Expiry -->
+              <div class="mt-4 pt-3 border-t border-dashed border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
+                <span v-if="coupon.min_order_amount">
+                  Đơn từ: <strong class="text-gray-700 font-semibold">{{ formatPrice(coupon.min_order_amount) }}</strong>
+                </span>
+                <span v-else class="text-emerald-600 font-medium">Mọi giá trị đơn</span>
+
+                <span>
+                  <i class="fa-regular fa-clock mr-1"></i>HSD: {{ formatCouponDate(coupon.expires_at) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Dashed Divider with Ticket Cutout Notches -->
+            <div class="relative w-px bg-gray-200 flex flex-col justify-between items-center my-2">
+              <div class="w-3 h-3 bg-white rounded-full -mt-3.5 -ml-1 border border-pink-200"></div>
+              <div class="w-3 h-3 bg-white rounded-full -mb-3.5 -ml-1 border border-pink-200"></div>
+            </div>
+
+            <!-- Right Action Stub (Code + Copy Button) -->
+            <div class="p-4 flex flex-col items-center justify-center bg-pink-50/30 w-28 shrink-0 text-center">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Mã</span>
+              <span class="font-mono font-bold text-xs text-pink-700 bg-pink-100/80 px-2 py-1 rounded border border-dashed border-pink-300 select-all mb-2.5">
+                {{ coupon.code }}
+              </span>
+
+              <button
+                @click="copyCouponCode(coupon.code)"
+                type="button"
+                :class="copiedCode === coupon.code ? 'bg-emerald-600 text-white' : 'bg-pink-600 text-white hover:bg-pink-700 shadow-sm shadow-pink-200'"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all transform active:scale-95 flex items-center justify-center space-x-1 w-full"
+              >
+                <i :class="copiedCode === coupon.code ? 'fa-solid fa-check' : 'fa-regular fa-copy'" class="text-xs"></i>
+                <span>{{ copiedCode === coupon.code ? 'Đã lưu' : 'Lấy mã' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Featured Products -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

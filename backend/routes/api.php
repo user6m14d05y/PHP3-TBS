@@ -77,6 +77,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::delete('/shops/{shop}', [ShopController::class, 'destroy']);
 });
 
+// Public coupon routes
+Route::get('/coupons/public', [CouponController::class, 'publicList']);
+
 // Coupon admin routes
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/coupons', [CouponController::class, 'index']);

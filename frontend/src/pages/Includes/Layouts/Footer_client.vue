@@ -412,18 +412,5 @@ const SubmitContact = async () => {
   transform: translateY(12px) scale(0.96);
 }
 
-/* Custom scrollbar for horizontal product list */
-.overflow-x-auto::-webkit-scrollbar {
-  height: 4px;
-}
-.overflow-x-auto::-webkit-scrollbar-track {
-  background: #fdf2f2;
-}
-.overflow-x-auto::-webkit-scrollbar-thumb {
-  background-color: #fbcfe8;
-  border-radius: 4px;
-}
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background-color: #f472b6;
-}
+
 </style>

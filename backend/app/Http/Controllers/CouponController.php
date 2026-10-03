@@ -12,6 +12,30 @@ use Illuminate\Validation\ValidationException;
 
 class CouponController extends Controller
 {
+    public function publicList()
+    {
+        $now = now();
+        $coupons = Coupon::query()
+            ->where('is_active', true)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>=', $now);
+            })
+            ->where(function ($q) {
+                $q->whereNull('usage_limit')
+                  ->orWhereRaw('used_count < usage_limit');
+            })
+            ->latest('id')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $coupons,
+        ]);
+    }
+
     public function index()
     {
         $this->assertAdmin(request());

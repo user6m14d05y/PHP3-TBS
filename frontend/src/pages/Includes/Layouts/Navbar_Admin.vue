@@ -127,18 +127,5 @@ const getLinkClass = (path, exact = false) => {
 </template>
 
 <style scoped>
-/* Tuỳ chỉnh thanh cuộn cho thanh lịch giống Admin phổ thông hiện đại */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #475569;
-}
+
 </style>

@@ -568,18 +568,7 @@ const submitOrder = async () => {
 </template>
 <style scoped>
 
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-            }
 
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background-color: #E5E7EB;
-                border-radius: 20px;
-            }
-
-            .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-                background-color: #374151;
-            }
             input{
                 padding: 13px;
                 outline-color: #D14D72;
