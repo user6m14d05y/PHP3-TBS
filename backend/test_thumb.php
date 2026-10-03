@@ -1,0 +1,1 @@
+<?php require __DIR__."/vendor/autoload.php"; $app = require_once __DIR__."/bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $cart = \App\Models\Cart::with(["items.productVariant.product"])->first(); dump($cart->items->first()->productVariant->product->thumbnail);
