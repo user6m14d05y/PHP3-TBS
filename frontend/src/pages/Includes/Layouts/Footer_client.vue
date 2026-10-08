@@ -203,9 +203,9 @@ const SubmitContact = async () => {
         Chat Zalo
       </span>
       <div
-        class="w-12 h-12 flex items-center justify-center bg-[#0068ff] text-white rounded-full shadow-lg group-hover:scale-110 transition-all duration-300 relative">
+        class="w-12 h-12 flex items-center justify-center bg-[#0068ff] text-white rounded-full shadow-lg group-hover:scale-110 transition-all duration-300 relative overflow-hidden">
         <span class="absolute inset-0 rounded-full bg-[#0068ff] animate-ping opacity-40"></span>
-        <span class="relative z-10 text-[13px] font-black tracking-tight">Zalo</span>
+        <img src="/images/zalo-icon.png" alt="Zalo" class="w-full h-full object-contain relative z-10 rounded-full" />
       </div>
     </a>
 

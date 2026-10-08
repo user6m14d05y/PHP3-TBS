@@ -7,6 +7,7 @@ import axios from 'axios';
 import { setPageSeo } from '@/utils/seo';
 import { apiUrl, imageUrl, videoUrl } from '@/utils/api';
 import QuickAddCartModal from '@/components/QuickAddCartModal.vue';
+import CouponDetailModal from '@/components/CouponDetailModal.vue';
 import { useCartStore } from '@/stores/cart';
 import { useAuthStore } from '@/stores/auth';
 import Swal from 'sweetalert2';
@@ -77,6 +78,20 @@ const fetchCategories = () => {
 const coupons = ref([]);
 const isLoadingCoupons = ref(false);
 const copiedCode = ref(null);
+const couponCopyMessage = ref('');
+const couponCopyErrorCode = ref(null);
+const showCouponModal = ref(false);
+const selectedCoupon = ref(null);
+
+const openCouponModal = (coupon) => {
+  selectedCoupon.value = coupon;
+  showCouponModal.value = true;
+};
+
+const closeCouponModal = () => {
+  showCouponModal.value = false;
+  selectedCoupon.value = null;
+};
 
 const fetchCoupons = () => {
   isLoadingCoupons.value = true;
@@ -100,20 +115,103 @@ const formatCouponDate = (dateStr) => {
   return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 };
 
-const copyCouponCode = (code) => {
-  navigator.clipboard.writeText(code);
-  copiedCode.value = code;
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: `Đã sao chép mã: ${code}`,
-    showConfirmButton: false,
-    timer: 2000
-  });
-  setTimeout(() => {
-    if (copiedCode.value === code) copiedCode.value = null;
-  }, 3000);
+const formatPlainVND = (value) => {
+  return `${new Intl.NumberFormat('vi-VN').format(Number(value) || 0)} đ`;
+};
+
+const getCouponDiscountLabel = (coupon) => {
+  if (coupon.discount_type === 'percentage') {
+    return `GIẢM ${parseFloat(coupon.discount_value)}%`;
+  }
+
+  return `GIẢM ${formatPlainVND(coupon.discount_value)}`;
+};
+
+const hasCouponMaxDiscount = (coupon) => {
+  return coupon.discount_type === 'percentage' && Number(coupon.max_discount_amount) > 0;
+};
+
+const parseCouponDate = (dateStr) => {
+  if (!dateStr) return null;
+  const date = new Date(dateStr);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const isCouponExpired = (coupon) => {
+  const expiry = parseCouponDate(coupon.expires_at);
+  return !!expiry && expiry < new Date();
+};
+
+const isCouponUnavailable = (coupon) => {
+  const hasUsageLimit = coupon.usage_limit !== null && coupon.usage_limit !== undefined;
+  const usageLimitReached = hasUsageLimit && Number(coupon.used_count || 0) >= Number(coupon.usage_limit);
+
+  return coupon.is_active === false || usageLimitReached;
+};
+
+const isCouponNearExpiry = (coupon) => {
+  const expiry = parseCouponDate(coupon.expires_at);
+  if (!expiry || isCouponExpired(coupon)) return false;
+
+  const now = new Date();
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  return expiry.getTime() - now.getTime() <= sevenDays;
+};
+
+const getCouponStatusLabel = (coupon) => {
+  if (isCouponExpired(coupon)) return 'Đã hết hạn';
+  if (isCouponUnavailable(coupon)) return 'Tạm hết lượt dùng';
+  if (isCouponNearExpiry(coupon)) return 'Sắp hết hạn';
+
+  return 'Sẵn sàng sử dụng';
+};
+
+const canCopyCoupon = (coupon) => {
+  return !isCouponExpired(coupon) && !isCouponUnavailable(coupon);
+};
+
+const copyCouponCode = async (code) => {
+  if (!code) return;
+
+  couponCopyMessage.value = '';
+  couponCopyErrorCode.value = null;
+
+  try {
+    if (!navigator.clipboard?.writeText) {
+      throw new Error('Clipboard API is not available');
+    }
+
+    await navigator.clipboard.writeText(code);
+    copiedCode.value = code;
+    couponCopyMessage.value = `Đã sao chép mã ${code}`;
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Đã sao chép mã',
+      text: code,
+      showConfirmButton: false,
+      timer: 2000
+    });
+
+    setTimeout(() => {
+      if (copiedCode.value === code) copiedCode.value = null;
+    }, 3000);
+  } catch {
+    couponCopyErrorCode.value = code;
+    couponCopyMessage.value = `Không thể sao chép mã ${code}. Vui lòng thử lại.`;
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'Không thể sao chép mã',
+      text: 'Vui lòng thử lại hoặc sao chép thủ công.',
+      showConfirmButton: false,
+      timer: 2500
+    });
+  }
 };
 
 const formatPrice = (price) => {
@@ -252,90 +350,123 @@ onMounted(() => {
     </div>
 
     <!-- Voucher / Coupon Promotion Section -->
-    <section v-if="coupons.length > 0" class="bg-gradient-to-b from-pink-50/40 via-white to-white py-14 border-b border-pink-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
+    <section
+      v-if="coupons.length > 0"
+      aria-labelledby="voucher-section-title"
+      class="border-y border-[#eaded2] bg-[#fffaf6] py-10 sm:py-12"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div class="flex items-center space-x-2 text-pink-600 font-semibold text-xs uppercase tracking-[0.25em] mb-2">
-              <i class="fa-solid fa-gift text-sm"></i>
-              <span>Ưu Đãi Đặc Biệt</span>
+            <div class="mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-pink-700">
+              <span aria-hidden="true" class="h-px w-6 bg-pink-300"></span>
+              <span>ƯU ĐÃI ĐẶC BIỆT</span>
             </div>
-            <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 italic">Mã Giảm Giá Dành Cho Bạn</h2>
-            <p class="text-gray-500 font-light text-sm mt-1">Lưu ngay voucher để nhận ưu đãi giảm giá tốt nhất khi đặt hoa.</p>
+            <h2 id="voucher-section-title" class="font-serif text-2xl font-bold italic leading-tight text-[#17251d] sm:text-3xl lg:text-4xl">
+              Mã Giảm Giá Dành Cho Bạn
+            </h2>
+            <p class="mt-1 text-xs text-[#5f6b62] sm:text-sm">
+              Lưu mã nhận ưu đãi khi đặt hoa. Click vào thẻ để xem chi tiết điều kiện.
+            </p>
           </div>
-          <span class="text-xs bg-pink-100/70 text-pink-700 px-3.5 py-1.5 rounded-full font-semibold border border-pink-200/60 shadow-xs flex items-center">
-            <i class="fa-solid fa-ticket mr-1.5 text-pink-500"></i> {{ coupons.length }} mã ưu đãi sẵn sàng
-          </span>
+
+          <div class="inline-flex w-fit items-center gap-2 border border-pink-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-[#17251d] shadow-xs">
+            <i aria-hidden="true" class="fa-solid fa-ticket text-pink-600 text-xs"></i>
+            <span>{{ coupons.length }} mã ưu đãi sẵn sàng</span>
+          </div>
         </div>
 
-        <!-- Coupons Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
+        <p class="sr-only" aria-live="polite">{{ couponCopyMessage }}</p>
+
+        <!-- Compact Coupons Grid -->
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <article
             v-for="coupon in coupons"
             :key="coupon.id"
-            class="relative flex bg-white border border-pink-200/80 rounded-2xl shadow-sm hover:shadow-xl hover:border-pink-300 transition-all duration-300 overflow-hidden group hover:-translate-y-1"
+            @click="openCouponModal(coupon)"
+            :class="[
+              'group relative flex flex-row border bg-white shadow-xs transition-all duration-300 hover:border-pink-300 hover:shadow-md cursor-pointer overflow-hidden',
+              canCopyCoupon(coupon) ? 'border-[#eaded2]' : 'border-gray-200 opacity-80'
+            ]"
           >
-            <!-- Left Ticket Accent Strip -->
-            <div class="w-3 bg-gradient-to-b from-pink-500 to-rose-400 shrink-0"></div>
+            <!-- Left Stub (Discount highlight) -->
+            <div class="w-28 sm:w-32 bg-[#fff8f5] border-r border-dashed border-[#eaded2] p-3 flex flex-col justify-center items-center text-center shrink-0">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-[#7b8a80]">Ưu đãi</span>
+              <span class="text-lg sm:text-xl font-black text-pink-700 tracking-tight my-1 leading-tight break-words">
+                {{ getCouponDiscountLabel(coupon) }}
+              </span>
+              <span v-if="hasCouponMaxDiscount(coupon)" class="text-[9px] text-[#5f6b62] leading-tight line-clamp-1">
+                Tối đa {{ formatPlainVND(coupon.max_discount_amount) }}
+              </span>
+              <span
+                :class="[
+                  'mt-1.5 inline-block px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border',
+                  isCouponExpired(coupon) || isCouponUnavailable(coupon)
+                    ? 'bg-gray-100 text-gray-500 border-gray-200'
+                    : isCouponNearExpiry(coupon)
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                ]"
+              >
+                {{ getCouponStatusLabel(coupon) }}
+              </span>
+            </div>
 
-            <!-- Main Coupon Content -->
-            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+            <!-- Right Stub (Information & Action) -->
+            <div class="flex-1 p-3.5 flex flex-col justify-between min-w-0 bg-white">
               <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-pink-50 text-pink-600 border border-pink-100">
-                    {{ coupon.discount_type === 'percentage' ? `Giảm ${parseFloat(coupon.discount_value)}%` : `Giảm ${formatPrice(coupon.discount_value)}` }}
-                  </span>
-                  <span v-if="coupon.discount_type === 'percentage' && coupon.max_discount_amount" class="text-[11px] text-gray-400">
-                    Tối đa {{ formatPrice(coupon.max_discount_amount) }}
+                <div class="flex items-start justify-between gap-1.5">
+                  <h3 class="font-serif text-sm font-bold text-[#17251d] line-clamp-1 transition group-hover:text-pink-700">
+                    {{ coupon.name || 'Mã giảm giá TBS Flora' }}
+                  </h3>
+                  <span class="shrink-0 text-[10px] font-semibold text-pink-700 group-hover:underline">
+                    Chi tiết <i class="fa-solid fa-chevron-right text-[8px] ml-0.5"></i>
                   </span>
                 </div>
 
-                <h3 class="font-bold text-gray-900 text-base group-hover:text-pink-600 transition-colors line-clamp-1">
-                  {{ coupon.name || 'Mã giảm giá hấp dẫn' }}
-                </h3>
-
-                <p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
-                  {{ coupon.description || (coupon.min_order_amount ? `Áp dụng cho đơn hàng từ ${formatPrice(coupon.min_order_amount)}.` : 'Áp dụng cho mọi đơn hàng.') }}
+                <p class="mt-1 text-xs text-[#5f6b62] line-clamp-1">
+                  {{ coupon.description || (coupon.min_order_amount ? `Đơn từ ${formatPlainVND(coupon.min_order_amount)}` : 'Áp dụng mọi đơn hàng') }}
                 </p>
+
+                <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-[#7b8a80]">
+                  <span>
+                    <i class="fa-solid fa-bag-shopping mr-1 text-pink-600 text-[10px]"></i>
+                    {{ coupon.min_order_amount ? `Đơn từ ${formatPlainVND(coupon.min_order_amount)}` : 'Mọi đơn' }}
+                  </span>
+                  <span>•</span>
+                  <span>
+                    <i class="fa-regular fa-clock mr-1 text-pink-600 text-[10px]"></i>
+                    {{ formatCouponDate(coupon.expires_at) }}
+                  </span>
+                </div>
               </div>
 
-              <!-- Extra Conditions & Expiry -->
-              <div class="mt-4 pt-3 border-t border-dashed border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
-                <span v-if="coupon.min_order_amount">
-                  Đơn từ: <strong class="text-gray-700 font-semibold">{{ formatPrice(coupon.min_order_amount) }}</strong>
-                </span>
-                <span v-else class="text-emerald-600 font-medium">Mọi giá trị đơn</span>
+              <!-- Bottom Bar: Code + Action button -->
+              <div class="mt-2.5 pt-2 border-t border-dashed border-[#eaded2] flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <span class="inline-block font-mono text-xs font-black tracking-wider border border-dashed border-pink-300 bg-pink-50 px-2 py-0.5 text-pink-800 select-all">
+                    {{ coupon.code }}
+                  </span>
+                </div>
 
-                <span>
-                  <i class="fa-regular fa-clock mr-1"></i>HSD: {{ formatCouponDate(coupon.expires_at) }}
-                </span>
+                <button
+                  @click.stop="copyCouponCode(coupon.code)"
+                  type="button"
+                  :disabled="!canCopyCoupon(coupon)"
+                  :aria-label="`Lấy mã ${coupon.code}`"
+                  :class="!canCopyCoupon(coupon)
+                    ? 'cursor-not-allowed bg-gray-200 text-gray-500 border border-gray-300'
+                    : copiedCode === coupon.code
+                      ? 'bg-emerald-700 text-white'
+                      : 'bg-pink-700 text-white hover:bg-pink-800'"
+                  class="inline-flex min-h-7 items-center justify-center gap-1.5 px-3 py-1 text-[11px] font-black uppercase tracking-wider transition shrink-0"
+                >
+                  <i :class="copiedCode === coupon.code ? 'fa-solid fa-check' : 'fa-regular fa-copy'" class="text-[10px]"></i>
+                  <span>{{ copiedCode === coupon.code ? 'ĐÃ LƯU' : 'LẤY MÃ' }}</span>
+                </button>
               </div>
             </div>
-
-            <!-- Dashed Divider with Ticket Cutout Notches -->
-            <div class="relative w-px bg-gray-200 flex flex-col justify-between items-center my-2">
-              <div class="w-3 h-3 bg-white rounded-full -mt-3.5 -ml-1 border border-pink-200"></div>
-              <div class="w-3 h-3 bg-white rounded-full -mb-3.5 -ml-1 border border-pink-200"></div>
-            </div>
-
-            <!-- Right Action Stub (Code + Copy Button) -->
-            <div class="p-4 flex flex-col items-center justify-center bg-pink-50/30 w-28 shrink-0 text-center">
-              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Mã</span>
-              <span class="font-mono font-bold text-xs text-pink-700 bg-pink-100/80 px-2 py-1 rounded border border-dashed border-pink-300 select-all mb-2.5">
-                {{ coupon.code }}
-              </span>
-
-              <button
-                @click="copyCouponCode(coupon.code)"
-                type="button"
-                :class="copiedCode === coupon.code ? 'bg-emerald-600 text-white' : 'bg-pink-600 text-white hover:bg-pink-700 shadow-sm shadow-pink-200'"
-                class="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all transform active:scale-95 flex items-center justify-center space-x-1 w-full"
-              >
-                <i :class="copiedCode === coupon.code ? 'fa-solid fa-check' : 'fa-regular fa-copy'" class="text-xs"></i>
-                <span>{{ copiedCode === coupon.code ? 'Đã lưu' : 'Lấy mã' }}</span>
-              </button>
-            </div>
-          </div>
+          </article>
         </div>
       </div>
     </section>
@@ -355,13 +486,13 @@ onMounted(() => {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div v-for="product in featuredProducts" :key="product.id" class="group cursor-pointer flex flex-col transition-all duration-500 ease-out hover:-translate-y-2">
-          <router-link :to="'/product/' + product.slug" class="relative h-96 mb-4 overflow-hidden bg-gray-100 block rounded-xl shadow-sm group-hover:shadow-xl transition-shadow duration-500">
+          <router-link :to="'/product/' + product.slug" class="relative h-96 mb-4 overflow-hidden bg-gray-100 block shadow-sm group-hover:shadow-xl transition-shadow duration-500">
             <span v-if="isNewProduct(product)"
-              class="absolute top-4 right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-pink-200">
+              class="absolute top-4 right-4 z-10 inline-flex items-center justify-center border border-white bg-pink-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
               New
             </span>
             <span v-if="getDiscountPercent(getBestVariant(product))"
-              class="absolute left-4 top-4 z-10 rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+              class="absolute left-4 top-4 z-10 bg-emerald-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
               -{{ getDiscountPercent(getBestVariant(product)) }}%
             </span>
             <img :src="imageUrl(product.thumbnail)" :alt="product.image_alt || product.name"
@@ -424,6 +555,12 @@ onMounted(() => {
       :show="showAddModal" 
       :product="selectedProduct" 
       @close="showAddModal = false" 
+    />
+
+    <CouponDetailModal
+      :show="showCouponModal"
+      :coupon="selectedCoupon"
+      @close="closeCouponModal"
     />
   </div>
 </template>
